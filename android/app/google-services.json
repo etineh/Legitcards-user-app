@@ -1,0 +1,67 @@
+{
+  "project_info": {
+    "project_number": "209392306167",
+    "project_id": "legitcards-3029d",
+    "storage_bucket": "legitcards-3029d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:209392306167:android:68cf7c7018e9dc287550f2",
+        "android_client_info": {
+          "package_name": "com.legitadmin"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCCOcPumIVc02xUYmQfkCd1IpOsyVZBLho"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:209392306167:android:6760b95bdb8a36757550f2",
+        "android_client_info": {
+          "package_name": "com.legitcardsadmin"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCCOcPumIVc02xUYmQfkCd1IpOsyVZBLho"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:209392306167:android:af45ef204c808df77550f2",
+        "android_client_info": {
+          "package_name": "com.legitcardsusers"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCCOcPumIVc02xUYmQfkCd1IpOsyVZBLho"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

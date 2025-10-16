@@ -26,4 +26,22 @@ class K {
   static const cancelTransaction = "Cancel Transaction";
   static const optInfo =
       "Please check your spam folder if not received in your inbox";
+
+  // usdt networks
+  static const usdtBep20 = "0x31CbBbb58bCa0E091B99Ae9427E777819ff790D8";
+  static const usdtTrc20 = "TYuHyss71JMVfvuv1v7d5tohqaNfimkmgd";
+  static const usdtErc20 = "0x31CbBbb58bCa0E091B99Ae9427E777819ff790D8";
+
+  // eth network
+  static const ethEthNet = "0x31CbBbb58bCa0E091B99Ae9427E777819ff790D8";
+
+  // btc network
+  static const btcBtcNet = "1LCsWQFKv5NUxkNi5hHFKFEWEz8oeGzE9Y";
+
+  static const BTC = "BTC";
+  static const USDT = "USDT";
+  static const ETH = "ETH";
+
+  static const CARD = "CARD";
+  static const CRYPTO = "CRYPTO";
 }

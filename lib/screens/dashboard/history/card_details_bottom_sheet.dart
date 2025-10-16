@@ -6,6 +6,7 @@ import 'package:legit_cards/Utilities/date_utils.dart';
 import 'package:legit_cards/constants/app_colors.dart';
 import 'package:legit_cards/extension/inbuilt_ext.dart';
 import 'package:legit_cards/screens/widgets/custom_text.dart';
+import 'package:path/path.dart';
 import '../../../constants/k.dart';
 import '../../../data/models/history_model.dart';
 
@@ -56,23 +57,6 @@ class CardDetailBottomSheet extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-
-          // Back button
-          // Padding(
-          //   padding: const EdgeInsets.symmetric(horizontal: 16),
-          //   child: Align(
-          //     alignment: Alignment.centerLeft,
-          //     child: IconButton(
-          //       icon: Icon(
-          //         Icons.arrow_back,
-          //         size: 28,
-          //         color: context.blackWhite,
-          //       ),
-          //       onPressed: () => Navigator.pop(context),
-          //     ),
-          //   ),
-          // ),
-          // const SizedBox(height: 8),
 
           Expanded(
             child: SingleChildScrollView(
@@ -209,8 +193,8 @@ class CardDetailBottomSheet extends StatelessWidget {
                     child: CircularProgressIndicator(strokeWidth: 2),
                   ),
                   errorWidget: (context, url, error) => Container(
-                    color: Colors.grey[300],
-                    child: const Icon(Icons.card_giftcard, size: 40),
+                    color: context.whiteBlack,
+                    child: const Icon(Icons.code_sharp, size: 40),
                   ),
                 ),
               ),
@@ -243,8 +227,14 @@ class CardDetailBottomSheet extends StatelessWidget {
           // Transaction details
           _buildDetailRow('Country', transaction.country),
           _buildDetailRow('Type', transaction.type),
-          _buildDetailRow('Card Amount', '\$${transaction.actualAmount}'),
+          _buildDetailRow(
+            transaction.type == "Crypto" ? 'Coin Amount' : 'Card Amount',
+            '\$${transaction.actualAmount}',
+          ),
           _buildDetailRow('Quantity', '${transaction.quantity}'),
+          if (transaction.status != "PENDING" &&
+              transaction.status != "CANCELLED")
+            _buildDetailRow('Feedback', transaction.feedbacks.join("\n")),
 
           _buildTransactionId(context),
 
@@ -254,6 +244,7 @@ class CardDetailBottomSheet extends StatelessWidget {
           CustomText(
             text: DateAndTimeUtils.formatTimestamp(transaction.createdAt),
             size: 14,
+            color: AppColors.white,
           ),
         ],
       ),
@@ -270,36 +261,14 @@ class CardDetailBottomSheet extends StatelessWidget {
           CustomText(
             text: value,
             shouldBold: true,
-            color: AppColors.white,
+            color: label == "Feedback"
+                ? AdjustUtils.getStatusColor(transaction.status)
+                : AppColors.white,
           ),
         ],
       ),
     );
   }
-
-  // Widget _buildCancelButton(BuildContext context) {
-  //   return SizedBox(
-  //     width: double.infinity,
-  //     height: 50,
-  //     child: TextButton(
-  //       onPressed: () {
-  //         _showCancelConfirmation(context);
-  //       },
-  //       style: TextButton.styleFrom(
-  //         backgroundColor: Colors.transparent,
-  //       ),
-  //       child: const Text(
-  //         'CANCEL TRANSACTION',
-  //         style: TextStyle(
-  //           fontSize: 16,
-  //           fontWeight: FontWeight.bold,
-  //           color: Colors.orange,
-  //           letterSpacing: 0.5,
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
 
   Widget _buildButton(BuildContext context) {
     return SizedBox(

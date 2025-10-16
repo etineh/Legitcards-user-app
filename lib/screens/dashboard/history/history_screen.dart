@@ -8,6 +8,7 @@ import 'package:legit_cards/screens/widgets/custom_text.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:provider/provider.dart';
 
+import '../../../constants/k.dart';
 import '../../../data/models/history_model.dart';
 import '../../../data/models/user_model.dart';
 import 'card_details_bottom_sheet.dart';
@@ -30,6 +31,7 @@ class _HistoryScreenState extends State<HistoryScreen>
   late TabController _tabController;
   late UserProfileM? user;
   late List<GiftCardTradeM> _cardHistory = [];
+  late List<GiftCardTradeM> _coinHistory = [];
 
   @override
   void initState() {
@@ -39,7 +41,7 @@ class _HistoryScreenState extends State<HistoryScreen>
     _fetchTransactions();
   }
 
-  Future<void> _fetchTransactions() async {
+  Future<void> _fetchTransactions({String from = K.CARD}) async {
     // Call your view model to fetch transactions
     final viewModel = Provider.of<HistoryViewModel>(context, listen: false);
     final payload = {
@@ -51,17 +53,19 @@ class _HistoryScreenState extends State<HistoryScreen>
       "start": 0,
       "sort": 'desc',
     };
-    final res = await viewModel.getCardHistory(payload, user!.token!);
+    final res =
+        await viewModel.getCardHistory(payload, user!.token!, from: from);
     if (res.statusCode == "TRADE_FOUND") {
       setState(() {
-        _cardHistory = res.data;
+        if (from == K.CARD) {
+          _cardHistory = res.data;
+        } else {
+          _coinHistory = res.data;
+        }
       });
     } else {
       if (mounted) context.toastMsg(res.message);
     }
-
-    // print(
-    //     "General log: what is res -- ${res.data[0].images} and msg ${res.message}");
   }
 
   @override
@@ -151,7 +155,7 @@ class _HistoryScreenState extends State<HistoryScreen>
       itemBuilder: (context, index) {
         final transaction = cardTransactions[index];
         return InkWell(
-          onTap: () => _openCardHistory(transaction),
+          onTap: () => _openTradeHistory(transaction),
           child: _buildTransactionCard(transaction),
         );
       },
@@ -160,19 +164,20 @@ class _HistoryScreenState extends State<HistoryScreen>
 
   Widget _buildCoinsTab() {
     // final fundTransactions = [_cardHistory];
-    final fundTransactions = [];
+    final coinTransactions = _coinHistory;
 
-    if (fundTransactions.isEmpty) {
+    if (coinTransactions.isEmpty) {
+      _fetchTransactions(from: K.CRYPTO);
       return _buildEmptyState('No coin— transactions yet');
     }
 
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      itemCount: fundTransactions.length,
+      itemCount: coinTransactions.length,
       itemBuilder: (context, index) {
-        final transaction = fundTransactions[index];
+        final transaction = coinTransactions[index];
         return InkWell(
-          onTap: () => _openCardHistory(transaction), // change later
+          onTap: () => _openTradeHistory(transaction, from: K.CRYPTO),
           child: _buildTransactionCard(transaction),
         );
       },
@@ -181,9 +186,12 @@ class _HistoryScreenState extends State<HistoryScreen>
 
   Widget _buildActivitiesTab() {
     // All activities combined
+    if (_coinHistory.isEmpty) {
+      _fetchTransactions(from: K.CRYPTO);
+    }
     final transactions = [
       ..._cardHistory,
-      // ..._cardHistory // change to fund later
+      ..._coinHistory // change to fund later
     ];
     transactions.sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
@@ -197,7 +205,7 @@ class _HistoryScreenState extends State<HistoryScreen>
       itemBuilder: (context, index) {
         final transaction = transactions[index];
         return InkWell(
-          onTap: () => _openCardHistory(transaction), // change later
+          onTap: () => _openTradeHistory(transaction), // change later
           child: _buildTransactionCard(transaction),
         );
       },
@@ -231,8 +239,11 @@ class _HistoryScreenState extends State<HistoryScreen>
               placeholder: (context, url) => const Center(
                 child: CircularProgressIndicator(strokeWidth: 2),
               ),
-              errorWidget: (context, url, error) =>
-                  const Icon(Icons.error, color: Colors.red),
+              errorWidget: (context, url, error) => transaction.assetName
+                          .toLowerCase() ==
+                      "btc"
+                  ? const Icon(Icons.currency_bitcoin, color: Colors.orange)
+                  : const Icon(Icons.settings_ethernet, color: Colors.orange),
             ),
           ),
           const SizedBox(width: 16),
@@ -302,15 +313,16 @@ class _HistoryScreenState extends State<HistoryScreen>
     );
   }
 
-  void _openCardHistory(GiftCardTradeM transaction) {
+  void _openTradeHistory(GiftCardTradeM transaction, {String from = K.CARD}) {
     CardDetailBottomSheet.show(context, transaction, "Cancel Transaction",
         () async {
+      // call back function
       final viewModel = Provider.of<HistoryViewModel>(context, listen: false);
-      final res = await viewModel.cancelCardTrade(user!, transaction.id);
+      final res = await viewModel.cancelTrade(user!, transaction.id, from);
 
       if (mounted) context.toastMsg(res.message);
       if (res.statusCode == "TRADE_CANCELLED") {
-        _fetchTransactions();
+        _fetchTransactions(from: from);
       }
     });
   }

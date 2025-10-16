@@ -10,6 +10,7 @@ import 'package:legit_cards/screens/auth/otp_screen.dart';
 import 'package:legit_cards/screens/auth/request_code_screen.dart';
 import 'package:legit_cards/screens/auth/reset_password_screen.dart';
 import 'package:legit_cards/screens/auth/signup_screen.dart';
+import 'package:legit_cards/screens/dashboard/coins/crypto_vm.dart';
 import 'package:legit_cards/screens/dashboard/dashboard_screen.dart';
 import 'package:legit_cards/screens/dashboard/gift_cards/gift_card_vm.dart';
 import 'package:legit_cards/screens/dashboard/history/history_view_model.dart';
@@ -45,6 +46,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => ProfileViewModel()),
         ChangeNotifierProvider(create: (_) => GiftCardTradeVM()),
         ChangeNotifierProvider(create: (_) => HistoryViewModel()),
+        ChangeNotifierProvider(create: (_) => CryptoViewModel()),
         // ChangeNotifierProvider(create: (_) => HistoryViewModel()),
         // ChangeNotifierProvider(create: (_) => HistoryViewModel()),
         // ChangeNotifierProvider(create: (_) => HistoryViewModel()),

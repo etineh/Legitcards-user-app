@@ -11,6 +11,7 @@ import 'package:provider/provider.dart';
 import '../../data/models/gift_card_trades_m.dart';
 import '../../data/repository/secure_storage_repo.dart';
 import '../profile/profile_view_model.dart';
+import 'coins/coin_screen.dart';
 import 'gift_cards/gift_card_screen.dart';
 import 'gift_cards/gift_card_vm.dart';
 import 'home_screen.dart';
@@ -156,7 +157,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
           transferSelectCard: card,
         );
       case 2:
-        return const SignupScreen(); // change later
+        return CoinScreen(
+          userProfileM: user,
+          onTabChange: onTabChange,
+        );
       case 3:
         return HistoryScreen(
           userProfileM: user,

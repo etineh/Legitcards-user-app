@@ -48,10 +48,19 @@ class GiftCardApi {
     return _parseResponse(response, (json) => GiftCardResponseM.fromJson(json));
   }
 
-  Future<GiftCardResponseM> cancelCardTrade(
-      UserProfileM user, String tradeId) async {
-    final url = Uri.parse(
-        "$baseUrl/api/trade/users/cancel?id=${user.userid}&tradeId=$tradeId");
+  // cancel card trade or crypto trade
+  Future<GiftCardResponseM> cancelTrade(
+      UserProfileM user, String tradeId, String from) async {
+    late Uri url;
+
+    if (from == K.CRYPTO) {
+      url = Uri.parse(
+          "$baseUrl/api/crypto/trade/users/cancel?id=${user.userid}&tradeId=$tradeId");
+    } else {
+      url = Uri.parse(
+          "$baseUrl/api/trade/users/cancel?id=${user.userid}&tradeId=$tradeId");
+    }
+
     final response = await http.get(
       url,
       headers: {
@@ -62,9 +71,13 @@ class GiftCardApi {
     return _parseResponse(response, (json) => GiftCardResponseM.fromJson(json));
   }
 
-  Future<HistoryResponseM> getCardHistory(
-      Map<String, dynamic> payload, String token) async {
-    final url = Uri.parse("$baseUrl/api/trade/users/get");
+  Future<HistoryResponseM> getTradeHistory(
+      Map<String, dynamic> payload, String token,
+      {String from = K.CARD}) async {
+    Uri url = Uri.parse("$baseUrl/api/trade/users/get");
+    if (from == K.CRYPTO) {
+      url = Uri.parse("$baseUrl/api/crypto/trade/users/get");
+    }
     final response = await http.post(
       url,
       headers: {

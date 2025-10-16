@@ -2,10 +2,13 @@ import 'package:legit_cards/data/models/user_model.dart';
 import 'package:legit_cards/data/repository/secure_storage_repo.dart';
 import 'package:legit_cards/services/api/profile_api.dart';
 
+import '../../constants/k.dart';
 import '../../extension/inbuilt_ext.dart';
 import '../../services/api/auth_api.dart';
+import '../../services/api/crypto_api.dart';
 import '../../services/api/gift_card_api.dart';
 import '../models/auth_model.dart';
+import '../models/crypto_trade_m.dart';
 import '../models/gift_card_trades_m.dart';
 import '../models/history_model.dart';
 import '../models/user_bank_model.dart';
@@ -14,6 +17,7 @@ class AppRepository {
   final AuthApi _authApi = AuthApi();
   final ProfileApi _profileApi = ProfileApi();
   final GiftCardApi _giftCardApi = GiftCardApi();
+  final CryptoApi _cryptoApi = CryptoApi();
 
   Future<ApiResponseM> signup(SignModel user) async {
     try {
@@ -264,10 +268,10 @@ class AppRepository {
     }
   }
 
-  Future<GiftCardResponseM> cancelCardTrade(
-      UserProfileM user, String tradeId) async {
+  Future<GiftCardResponseM> cancelTrade(
+      UserProfileM user, String tradeId, String from) async {
     try {
-      return await _giftCardApi.cancelCardTrade(user, tradeId);
+      return await _giftCardApi.cancelTrade(user, tradeId, from);
     } catch (e) {
       return checkError(e,
           createError: (String message) => GiftCardResponseM.error(message));
@@ -276,13 +280,44 @@ class AppRepository {
 
   //  ==============  Gift Card History
 
-  Future<HistoryResponseM> getCardHistory(
-      Map<String, dynamic> payload, String token) async {
+  Future<HistoryResponseM> getTradeHistory(
+      Map<String, dynamic> payload, String token,
+      {String from = K.CARD}) async {
     try {
-      return await _giftCardApi.getCardHistory(payload, token);
+      return await _giftCardApi.getTradeHistory(payload, token, from: from);
     } catch (e) {
       return checkError(e,
           createError: (String message) => HistoryResponseM.error(message));
+    }
+  }
+
+  //  ==============  Crypto Trade
+
+  Future<CryptoRateResponse> fetchCryptoRate(
+    UserProfileM user,
+    String coinName,
+  ) async {
+    try {
+      return await _cryptoApi.fetchCryptoRate(user, coinName);
+    } catch (e) {
+      return checkError(
+        e,
+        createError: (String message) => CryptoRateResponse.error(message),
+      );
+    }
+  }
+
+  Future<CryptoTransactionResM> sellCrypto(
+    Map<String, dynamic> fieldMap,
+    String token,
+  ) async {
+    try {
+      return await _cryptoApi.sellCrypto(fieldMap, token);
+    } catch (e) {
+      return checkError(
+        e,
+        createError: (String message) => CryptoTransactionResM.error(message),
+      );
     }
   }
 

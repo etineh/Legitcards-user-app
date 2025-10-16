@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:legit_cards/screens/widgets/custom_text.dart';
 
@@ -57,13 +58,15 @@ extension ContextExtensions on BuildContext {
     }
   }
 
-  void toastMsg(String message, {Color color = Colors.orange}) {
+  void toastMsg(String message,
+      {Color color = Colors.orange, int timeInSec = 4}) {
     ScaffoldMessenger.of(this)
       ..removeCurrentSnackBar()
       ..showSnackBar(
         SnackBar(
           content: Text(message),
           backgroundColor: color,
+          duration: Duration(seconds: timeInSec),
         ),
       );
   }
@@ -86,6 +89,11 @@ extension ContextExtensions on BuildContext {
 
   void hideKeyboard() {
     FocusScope.of(this).unfocus(); // hide keyboard
+  }
+
+  void copyText({String textToCopy = ""}) {
+    Clipboard.setData(ClipboardData(text: textToCopy));
+    toastMsg("Copied!");
   }
 }
 

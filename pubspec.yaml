@@ -43,6 +43,8 @@ dependencies:
   path: ^1.9.0
   # upload image to cloud
   cloudinary_public: ^0.23.1
+  #qr code
+  qr_flutter: ^4.1.0
 
 dev_dependencies:
   flutter_test:

@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:legit_cards/data/models/user_model.dart';
+import '../../../constants/k.dart';
 import '../../../data/models/gift_card_trades_m.dart';
 import '../../../data/models/history_model.dart';
 import '../../../data/repository/app_repository.dart';
@@ -12,13 +13,14 @@ class HistoryViewModel extends ChangeNotifier {
   bool get isLoading => _isLoading;
 
   Future<HistoryResponseM> getCardHistory(
-      Map<String, dynamic> payload, String token) async {
-    return getResponse(_repository.getCardHistory(payload, token));
+      Map<String, dynamic> payload, String token,
+      {String from = K.CARD}) async {
+    return getResponse(_repository.getTradeHistory(payload, token, from: from));
   }
 
-  Future<GiftCardResponseM> cancelCardTrade(
-      UserProfileM user, String tradeId) async {
-    return getResponse(_repository.cancelCardTrade(user, tradeId));
+  Future<GiftCardResponseM> cancelTrade(
+      UserProfileM user, String tradeId, String from) async {
+    return getResponse(_repository.cancelTrade(user, tradeId, from));
   }
 
   // reusable function

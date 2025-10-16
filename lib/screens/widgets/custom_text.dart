@@ -23,7 +23,7 @@ class CustomText extends StatelessWidget {
     this.underline = false,
     this.onTap,
     this.splashColor,
-    this.maxLines = 4,
+    this.maxLines = 10,
     this.overflow = TextOverflow.ellipsis, // default to ellipsis
   });
 

@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:legit_cards/Utilities/cache_utils.dart';
+import 'package:legit_cards/constants/app_colors.dart';
 import 'package:legit_cards/data/models/user_model.dart';
 import 'package:legit_cards/extension/inbuilt_ext.dart';
-import 'package:legit_cards/screens/auth/login_screen.dart';
-import 'package:legit_cards/screens/auth/signup_screen.dart';
 import 'package:legit_cards/screens/dashboard/history/history_screen.dart';
 import 'package:provider/provider.dart';
 
 import '../../data/models/gift_card_trades_m.dart';
 import '../../data/repository/secure_storage_repo.dart';
 import '../profile/profile_view_model.dart';
+import '../wallet/withdrawal_screen.dart';
 import 'coins/coin_screen.dart';
 import 'gift_cards/gift_card_screen.dart';
 import 'gift_cards/gift_card_vm.dart';
-import 'home_screen.dart';
+import 'home/home_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   final UserProfileM? userProfileM;
@@ -35,6 +35,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
   void initState() {
     super.initState();
     _loadUserProfile();
+  }
+
+  // Add the onTabChange method
+  void onTabChange(int index) {
+    setState(() {
+      currentIndex = index;
+    });
   }
 
   void updateSelectedCard(GiftCardAssetM card) {
@@ -99,7 +106,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         backgroundColor: context.backgroundColor,
         bottomNavigationBar: BottomNavigationBar(
           currentIndex: currentIndex,
-          selectedItemColor: Colors.purple,
+          selectedItemColor: AppColors.lightPurple,
           unselectedItemColor: Colors.grey,
           type: BottomNavigationBarType.fixed, // important for text to show
           showUnselectedLabels: true, // <— make sure unselected text shows
@@ -128,7 +135,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ],
         ),
         body: SafeArea(
-          child: _getBody(currentIndex, userProfileM, (index) {
+          child: _getBody(currentIndex, (index) {
             setState(() {
               currentIndex = index;
             });
@@ -138,7 +145,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _getBody(int index, UserProfileM? user, Function(int) onTabChange) {
+  Widget _getBody(int index, Function(int) onTabChange) {
     // print("General log: what is index - $index");
     final card = selectedCard; // temporarily store it
     selectedCard = null; // immediately reset so next time it's null
@@ -146,28 +153,29 @@ class _DashboardScreenState extends State<DashboardScreen> {
     switch (index) {
       case 0:
         return HomeScreen(
-          userProfileM: user,
+          userProfileM: userProfileM,
           onTabChange: onTabChange,
           onCardSelected: updateSelectedCard,
+          // onWithdrawalTap: _handleWithdrawalNavigation, // Pass the handler
         );
       case 1:
         return GiftCardScreen(
-          userProfileM: user,
+          userProfileM: userProfileM,
           onTabChange: onTabChange,
           transferSelectCard: card,
         );
       case 2:
         return CoinScreen(
-          userProfileM: user,
+          userProfileM: userProfileM,
           onTabChange: onTabChange,
         );
       case 3:
         return HistoryScreen(
-          userProfileM: user,
+          userProfileM: userProfileM,
         ); // change later
       default:
         return HomeScreen(
-          userProfileM: user,
+          userProfileM: userProfileM,
           onTabChange: onTabChange,
         );
     }

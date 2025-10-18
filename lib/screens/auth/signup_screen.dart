@@ -16,6 +16,7 @@ import '../../Utilities/device_utils.dart';
 import '../../services/validation_service.dart';
 import 'auth_view_model.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -226,8 +227,10 @@ class _SignupScreenState extends State<SignupScreen> {
                         _termsAccepted = value;
                       });
                     },
-                    onPrivacyPolicyTap: () {/*go to Policy*/},
-                    onTermsTap: () {/*go to terms*/},
+                    onPrivacyPolicyTap: () => _launchUrl(
+                        'https://legitcards.com.ng/privacy-policy.php'),
+                    onTermsTap: () =>
+                        _launchUrl('https://legitcards.com.ng/terms.php'),
                     prefixText:
                         'By clicking Sign Up, you have read and agreed to our ',
                   ),
@@ -257,6 +260,16 @@ class _SignupScreenState extends State<SignupScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _launchUrl(String urlString) async {
+    final Uri url = Uri.parse(urlString);
+
+    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+      if (mounted) {
+        context.toastMsg('Could not open link');
+      }
+    }
   }
 }
 

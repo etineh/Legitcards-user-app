@@ -14,6 +14,7 @@ import 'dart:io';
 import 'package:provider/provider.dart';
 
 import '../../../Utilities/cloudinary_utils.dart';
+import '../../../constants/app_colors.dart';
 import '../../../data/models/history_model.dart';
 import '../../../data/models/user_model.dart';
 import '../../widgets/gift_card_item.wg.dart';
@@ -687,12 +688,13 @@ class _GiftCardScreenState extends State<GiftCardScreen> {
     return isValid
         ? PrimaryButton(
             onPressed: _showTradeSummary,
+            backgroundColor: AppColors.lightPurple,
             text: "Proceed",
             textStyle: const TextStyle(color: Colors.white, fontSize: 18),
           )
         : PrimaryButton(
             disabledBackgroundColor: context.backgroundGray,
-            text: "Sell Now",
+            text: "Proceed",
             textStyle: const TextStyle(color: Colors.grey, fontSize: 18),
           );
   }

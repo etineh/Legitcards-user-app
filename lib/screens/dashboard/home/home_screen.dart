@@ -3,24 +3,30 @@ import 'package:flutter/material.dart';
 import 'package:legit_cards/Utilities/adjust_utils.dart';
 import 'package:legit_cards/constants/app_colors.dart';
 import 'package:legit_cards/extension/inbuilt_ext.dart';
+import 'package:legit_cards/screens/wallet/wallet_view_model.dart';
 import 'package:legit_cards/screens/widgets/custom_text.dart';
 import 'package:provider/provider.dart';
 
-import '../../constants/k.dart';
-import '../../data/models/gift_card_trades_m.dart';
-import '../../data/models/user_model.dart';
-import '../../data/repository/secure_storage_repo.dart';
-import 'gift_cards/gift_card_vm.dart';
+import '../../../constants/k.dart';
+import '../../../data/models/gift_card_trades_m.dart';
+import '../../../data/models/user_model.dart';
+import '../../../data/repository/secure_storage_repo.dart';
+import '../../wallet/withdrawal_screen.dart';
+import '../gift_cards/gift_card_vm.dart';
 
 class HomeScreen extends StatefulWidget {
   final UserProfileM? userProfileM;
   final Function(int)? onTabChange;
   final Function(GiftCardAssetM)? onCardSelected;
-  const HomeScreen(
-      {super.key,
-      required this.userProfileM,
-      this.onTabChange,
-      this.onCardSelected});
+  // final VoidCallback? onWithdrawalTap;
+
+  const HomeScreen({
+    super.key,
+    required this.userProfileM,
+    this.onTabChange,
+    this.onCardSelected,
+    // this.onWithdrawalTap,
+  });
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -30,6 +36,8 @@ class _HomeScreenState extends State<HomeScreen> {
   late final UserProfileM? userProfileM;
   late final Function(int)? onTabChange;
   late final Function(GiftCardAssetM)? onCardSelected;
+  // String walletBalance = "₦ 150,000.00";
+  bool _isBalanceVisible = true;
 
   @override
   void initState() {
@@ -37,12 +45,19 @@ class _HomeScreenState extends State<HomeScreen> {
     userProfileM = widget.userProfileM!;
     onTabChange = widget.onTabChange;
     onCardSelected = widget.onCardSelected;
-
+    fetchBalance();
     super.initState();
+  }
+
+  void fetchBalance() {
+    WalletViewModel viewModel =
+        Provider.of<WalletViewModel>(context, listen: false);
+    viewModel.fetchBalance(userProfileM!, context: context);
   }
 
   @override
   Widget build(BuildContext context) {
+    WalletViewModel walletVM = Provider.of<WalletViewModel>(context);
     return SingleChildScrollView(
       child: Container(
         margin: const EdgeInsets.all(15),
@@ -54,7 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 20),
 
             /// Wallet Balance Card
-            _wallet(),
+            _wallet(walletVM),
             const SizedBox(height: 20),
 
             /// Card and Crypto Action Buttons
@@ -95,7 +110,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(width: 10),
             CustomText(
-              text: "Hi, ${AdjustUtils.shortName(userProfileM!.username)}!",
+              text: "Hi, ${AdjustUtils.shortName(userProfileM!.firstname)}!",
               size: 18,
               shouldBold: true,
             )
@@ -171,6 +186,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: InkWell(
             onTap: () {
               // Navigate to trade coins
+              onTabChange?.call(2);
             },
             child: Container(
               padding: const EdgeInsets.all(20),
@@ -203,12 +219,11 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _wallet() {
+  Widget _wallet(WalletViewModel walletVM) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
-        // color: AppColors.lightPurple,
         gradient: const LinearGradient(
           colors: [
             Color(0xFFBF2882), // light purple
@@ -231,19 +246,67 @@ class _HomeScreenState extends State<HomeScreen> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           // Left side - Balance
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                CustomText(text: "Balance", size: 18, color: Colors.white70),
-                // const SizedBox(height: 8),
-                Text(
-                  "₦ 150,000.00",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
+                InkWell(
+                  onTap: () {
+                    setState(() {
+                      _isBalanceVisible = !_isBalanceVisible;
+                    });
+                  },
+                  child: Row(
+                    children: [
+                      const CustomText(
+                        text: "Balance",
+                        size: 18,
+                        color: Colors.white70,
+                      ),
+                      const SizedBox(width: 15),
+                      AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 200),
+                        child: Icon(
+                          _isBalanceVisible
+                              ? Icons.visibility_outlined
+                              : Icons.visibility_off_outlined,
+                          key: ValueKey(_isBalanceVisible),
+                          color: Colors.white70,
+                          size: 20,
+                        ),
+                      ),
+                    ],
                   ),
+                ),
+                const SizedBox(height: 4),
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  transitionBuilder: (child, animation) {
+                    return FadeTransition(
+                      opacity: animation,
+                      child: child,
+                    );
+                  },
+                  // if walletVM.isLoading -- rotate loading circle bar on the balance and show bal when false
+                  child: walletVM.isLoading
+                      ? const SizedBox(
+                          height: 25,
+                          width: 25,
+                          child: CircularProgressIndicator(
+                            color: Colors.white70,
+                            strokeWidth: 2.5,
+                          ),
+                        )
+                      : CustomText(
+                          key: ValueKey(
+                              '${_isBalanceVisible}_${walletVM.wallet?.balance}'),
+                          text: _isBalanceVisible
+                              ? "₦${AdjustUtils.formatWithComma(walletVM.wallet?.balance ?? 0.00)}"
+                              : "₦*******",
+                          size: 25,
+                          shouldBold: true,
+                          color: Colors.white,
+                        ),
                 ),
               ],
             ),
@@ -259,10 +322,8 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               padding: const EdgeInsets.symmetric(horizontal: 12),
             ),
-            onPressed: () {
-              // Withdraw logic
-              context.toastMsg("in progress");
-            },
+            onPressed: () => context.goNextScreenWithData(K.withdrawScreen,
+                extra: userProfileM),
             child: Text(
               "Withdraw",
               style: TextStyle(

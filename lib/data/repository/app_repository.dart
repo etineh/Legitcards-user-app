@@ -1,6 +1,8 @@
 import 'package:legit_cards/data/models/user_model.dart';
+import 'package:legit_cards/data/models/wallet_model.dart';
 import 'package:legit_cards/data/repository/secure_storage_repo.dart';
 import 'package:legit_cards/services/api/profile_api.dart';
+import 'package:legit_cards/services/api/wallet_api.dart';
 
 import '../../constants/k.dart';
 import '../../extension/inbuilt_ext.dart';
@@ -18,6 +20,7 @@ class AppRepository {
   final ProfileApi _profileApi = ProfileApi();
   final GiftCardApi _giftCardApi = GiftCardApi();
   final CryptoApi _cryptoApi = CryptoApi();
+  final WalletApi _walletApi = WalletApi();
 
   Future<ApiResponseM> signup(SignModel user) async {
     try {
@@ -318,6 +321,37 @@ class AppRepository {
         e,
         createError: (String message) => CryptoTransactionResM.error(message),
       );
+    }
+  }
+
+  //  ==============  Wallet
+
+  Future<WalletBalanceResponse> fetchBalance(UserProfileM user) async {
+    try {
+      return await _walletApi.fetchBalance(user);
+    } catch (e) {
+      return checkError(e,
+          createError: (String message) =>
+              WalletBalanceResponse.error(message));
+    }
+  }
+
+  Future<WithdrawalResponse> withdraw(
+      Map<String, dynamic> fieldMap, String token) async {
+    try {
+      return await _walletApi.withdraw(fieldMap, token);
+    } catch (e) {
+      return checkError(e,
+          createError: (String message) => WithdrawalResponse.error(message));
+    }
+  }
+
+  Future<WithdrawRecordResM> fetchWithdrawRecords(String userId) async {
+    try {
+      return await _walletApi.fetchWithdrawRecords(userId);
+    } catch (e) {
+      return checkError(e,
+          createError: (String message) => WithdrawRecordResM.error(message));
     }
   }
 

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:legit_cards/Utilities/adjust_utils.dart';
 import 'package:legit_cards/Utilities/date_utils.dart';
 import 'package:legit_cards/constants/app_colors.dart';
+import 'package:legit_cards/data/models/wallet_model.dart';
 import 'package:legit_cards/extension/inbuilt_ext.dart';
 import 'package:legit_cards/screens/widgets/custom_text.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
@@ -26,22 +27,20 @@ class HistoryScreen extends StatefulWidget {
 
 class _HistoryScreenState extends State<HistoryScreen>
     with SingleTickerProviderStateMixin {
-  // late final Function(int)? onTabChange;
-
   late TabController _tabController;
   late UserProfileM? user;
-  late List<GiftCardTradeM> _cardHistory = [];
-  late List<GiftCardTradeM> _coinHistory = [];
 
   @override
   void initState() {
     super.initState();
     user = widget.userProfileM!;
     _tabController = TabController(length: 3, vsync: this);
-    _fetchTransactions();
+    _fetchCardAndCryptoTransactions();
+    _fetchCardAndCryptoTransactions();
+    _fetchWithdrawTransactions();
   }
 
-  Future<void> _fetchTransactions({String from = K.CARD}) async {
+  Future<void> _fetchCardAndCryptoTransactions() async {
     // Call your view model to fetch transactions
     final viewModel = Provider.of<HistoryViewModel>(context, listen: false);
     final payload = {
@@ -53,19 +52,14 @@ class _HistoryScreenState extends State<HistoryScreen>
       "start": 0,
       "sort": 'desc',
     };
-    final res =
-        await viewModel.getCardHistory(payload, user!.token!, from: from);
-    if (res.statusCode == "TRADE_FOUND") {
-      setState(() {
-        if (from == K.CARD) {
-          _cardHistory = res.data;
-        } else {
-          _coinHistory = res.data;
-        }
-      });
-    } else {
-      if (mounted) context.toastMsg(res.message);
-    }
+
+    viewModel.fetchCardHistory(payload, user!.token!, context: context);
+    viewModel.fetchCoinHistory(payload, user!.token!, context: context);
+  }
+
+  void _fetchWithdrawTransactions() {
+    final viewModel = Provider.of<HistoryViewModel>(context, listen: false);
+    viewModel.fetchWithdrawRecords(user!.userid!, context: context);
   }
 
   @override
@@ -94,9 +88,9 @@ class _HistoryScreenState extends State<HistoryScreen>
                 child: TabBarView(
                   controller: _tabController,
                   children: [
-                    _buildCardsTab(),
-                    _buildCoinsTab(),
-                    _buildActivitiesTab(),
+                    _buildCardsTab(historyViewModel),
+                    _buildCoinsTab(historyViewModel),
+                    _buildWithdrawTab(historyViewModel),
                   ],
                 ),
               ),
@@ -136,24 +130,22 @@ class _HistoryScreenState extends State<HistoryScreen>
         tabs: const [
           Tab(text: 'CARDS'),
           Tab(text: 'COINS'),
-          Tab(text: 'ACTIVITIES'),
+          Tab(text: 'WITHDRAWS'),
         ],
       ),
     );
   }
 
-  Widget _buildCardsTab() {
-    final cardTransactions = _cardHistory;
-
-    if (cardTransactions.isEmpty) {
+  Widget _buildCardsTab(HistoryViewModel historyViewModel) {
+    if (historyViewModel.cardHistory.isEmpty) {
       return _buildEmptyState('No card transactions yet');
     }
 
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      itemCount: cardTransactions.length,
+      itemCount: historyViewModel.cardHistory.length,
       itemBuilder: (context, index) {
-        final transaction = cardTransactions[index];
+        final transaction = historyViewModel.cardHistory[index];
         return InkWell(
           onTap: () => _openTradeHistory(transaction),
           child: _buildTransactionCard(transaction),
@@ -162,53 +154,130 @@ class _HistoryScreenState extends State<HistoryScreen>
     );
   }
 
-  Widget _buildCoinsTab() {
-    // final fundTransactions = [_cardHistory];
-    final coinTransactions = _coinHistory;
-
-    if (coinTransactions.isEmpty) {
-      _fetchTransactions(from: K.CRYPTO);
+  Widget _buildCoinsTab(HistoryViewModel historyViewModel) {
+    if (historyViewModel.coinHistory.isEmpty) {
       return _buildEmptyState('No coin— transactions yet');
     }
 
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      itemCount: coinTransactions.length,
+      itemCount: historyViewModel.coinHistory.length,
       itemBuilder: (context, index) {
-        final transaction = coinTransactions[index];
+        final transaction = historyViewModel.coinHistory[index];
         return InkWell(
-          onTap: () => _openTradeHistory(transaction, from: K.CRYPTO),
+          onTap: () => _openTradeHistory(transaction, from: K.COIN),
           child: _buildTransactionCard(transaction),
         );
       },
     );
   }
 
-  Widget _buildActivitiesTab() {
-    // All activities combined
-    if (_coinHistory.isEmpty) {
-      _fetchTransactions(from: K.CRYPTO);
+  Widget _buildWithdrawTab(HistoryViewModel historyViewModel) {
+    if (historyViewModel.withdrawRecords.isEmpty) {
+      return _buildEmptyState('No card transactions yet');
     }
-    final transactions = [
-      ..._cardHistory,
-      ..._coinHistory // change to fund later
-    ];
-    transactions.sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
-    if (transactions.isEmpty) {
-      return _buildEmptyState('No activities yet');
+    // Sort by date (newest first)
+    historyViewModel.withdrawRecords
+        .sort((a, b) => (b.createdAt ?? '').compareTo(a.createdAt ?? ''));
+
+    if (historyViewModel.withdrawRecords.isEmpty) {
+      return _buildEmptyState('No withdrawal history yet');
     }
 
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      itemCount: transactions.length,
+      itemCount: historyViewModel.withdrawRecords.length,
       itemBuilder: (context, index) {
-        final transaction = transactions[index];
+        final withdraw = historyViewModel.withdrawRecords[index];
         return InkWell(
-          onTap: () => _openTradeHistory(transaction), // change later
-          child: _buildTransactionCard(transaction),
+          onTap: () => context.goNextScreenWithData(K.withdrawReceiptScreen,
+              extra: withdraw),
+          child: _buildWithdrawCard(withdraw),
         );
       },
+    );
+  }
+
+  Widget _buildWithdrawCard(WithdrawRecordM withdraw) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: context.cardColor,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: context.backgroundGray),
+      ),
+      child: Row(
+        children: [
+          // Icon - Bank/Withdrawal Icon
+          Container(
+            width: 60,
+            height: 60,
+            decoration: BoxDecoration(
+              color: context.purpleText.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(
+              Icons.account_balance,
+              color: context.purpleText,
+              size: 30,
+            ),
+          ),
+          const SizedBox(width: 16),
+
+          // Withdrawal Details
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CustomText(
+                  text: withdraw.bankName ?? 'Bank Withdrawal',
+                  shouldBold: true,
+                ),
+                const SizedBox(height: 4),
+                CustomText(
+                  text: withdraw.bankAccountNumber ?? '',
+                  size: 12,
+                  color: Colors.grey,
+                ),
+                const SizedBox(height: 4),
+                CustomText(
+                  text:
+                      DateAndTimeUtils.formatToDateAndTime(withdraw.createdAt),
+                  size: 12,
+                ),
+              ],
+            ),
+          ),
+
+          // Amount and Status
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              CustomText(
+                text:
+                    "₦ ${AdjustUtils.formatWithComma(withdraw.amount ?? 0.0)}",
+                shouldBold: true,
+              ),
+              const SizedBox(height: 4),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: AdjustUtils.getStatusColor(withdraw.status!)
+                      .withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: CustomText(
+                  text: withdraw.statusDisplay.toUpperCase(),
+                  size: 12,
+                  color: AdjustUtils.getStatusColor(withdraw.status!),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
@@ -322,7 +391,7 @@ class _HistoryScreenState extends State<HistoryScreen>
 
       if (mounted) context.toastMsg(res.message);
       if (res.statusCode == "TRADE_CANCELLED") {
-        _fetchTransactions(from: from);
+        _fetchCardAndCryptoTransactions();
       }
     });
   }

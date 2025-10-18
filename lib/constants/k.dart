@@ -1,3 +1,5 @@
+import 'dart:io';
+
 class K {
   static String baseUrl = "https://legitcards.ng";
 // static String baseUrl = "http://192.168.0.171:8080";
@@ -17,8 +19,9 @@ class K {
   static const enable2Fa = "/two-fa";
   static const login2Fa = "/login2fa";
   static const addBankName = "/add-bank";
-  static const viewBankAccount = "/View-bank-account";
-  // static const login2Fa = "/login2fa";
+  static const viewBankAccount = "/view-bank-account";
+  static const withdrawScreen = "/withdraw";
+  static const withdrawReceiptScreen = "/withdraw-receipt";
   // static const login2Fa = "/login2fa";
   // static const login2Fa = "/login2fa";
 
@@ -43,5 +46,13 @@ class K {
   static const ETH = "ETH";
 
   static const CARD = "CARD";
-  static const CRYPTO = "CRYPTO";
+  static const COIN = "CRYPTO";
+
+  static bool isAndroid() {
+    return Platform.isAndroid;
+  }
+
+  static bool isIOS() {
+    return Platform.isIOS;
+  }
 }

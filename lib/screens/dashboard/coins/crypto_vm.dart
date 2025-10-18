@@ -90,6 +90,16 @@ class CryptoViewModel extends ChangeNotifier {
 
   // other helper methods
 
+  /// Get all available coins (useful for displaying coin list)
+  List<String> get availableCoins => _rates.keys.toList();
+
+  /// Check if rates are loaded for a coin
+  bool hasRatesFor(String coinName) {
+    return _rates.containsKey(coinName) &&
+        _rates[coinName] != null &&
+        _rates[coinName]!.isNotEmpty;
+  }
+
   /// Get rate for specific amount
   CryptoRateM? getRateForAmount(String coinName, double amount) {
     final coinRates = _rates[coinName.toLowerCase()];
@@ -191,3 +201,16 @@ class CryptoViewModel extends ChangeNotifier {
     }
   }
 }
+
+/*
+ // get live bitcoin rate
+  const getLiveCryptoRate = async () => {
+    try {
+      const res = await axios.get(`https://bitpay.com/rates/BTC/USD`);
+      const _response_data = res.data;
+      setLiveCrptoRate(_response_data.data['rate']);
+    } catch (error) {
+      toast.show(error.message, {type: 'danger'});
+    }
+  };
+ */

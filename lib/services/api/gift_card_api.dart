@@ -53,7 +53,7 @@ class GiftCardApi {
       UserProfileM user, String tradeId, String from) async {
     late Uri url;
 
-    if (from == K.CRYPTO) {
+    if (from == K.COIN) {
       url = Uri.parse(
           "$baseUrl/api/crypto/trade/users/cancel?id=${user.userid}&tradeId=$tradeId");
     } else {
@@ -75,7 +75,7 @@ class GiftCardApi {
       Map<String, dynamic> payload, String token,
       {String from = K.CARD}) async {
     Uri url = Uri.parse("$baseUrl/api/trade/users/get");
-    if (from == K.CRYPTO) {
+    if (from == K.COIN) {
       url = Uri.parse("$baseUrl/api/crypto/trade/users/get");
     }
     final response = await http.post(

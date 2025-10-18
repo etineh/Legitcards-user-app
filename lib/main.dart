@@ -22,9 +22,13 @@ import 'package:legit_cards/screens/profile/enable_2fa_screen.dart';
 import 'package:legit_cards/screens/profile/profile_screen.dart';
 import 'package:legit_cards/screens/profile/profile_view_model.dart';
 import 'package:legit_cards/screens/profile/update_pin_screen.dart';
+import 'package:legit_cards/screens/wallet/wallet_view_model.dart';
+import 'package:legit_cards/screens/wallet/withdrawal_receipt_screen.dart';
+import 'package:legit_cards/screens/wallet/withdrawal_screen.dart';
 import 'constants/app_colors.dart';
 import 'constants/k.dart';
 import 'data/models/auth_model.dart';
+import 'data/models/wallet_model.dart';
 import 'firebase_options.dart';
 import 'platform_stub.dart' if (dart.library.html) 'platform_web.dart';
 import 'package:provider/provider.dart';
@@ -47,7 +51,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => GiftCardTradeVM()),
         ChangeNotifierProvider(create: (_) => HistoryViewModel()),
         ChangeNotifierProvider(create: (_) => CryptoViewModel()),
-        // ChangeNotifierProvider(create: (_) => HistoryViewModel()),
+        ChangeNotifierProvider(create: (_) => WalletViewModel()),
         // ChangeNotifierProvider(create: (_) => HistoryViewModel()),
         // ChangeNotifierProvider(create: (_) => HistoryViewModel()),
         // ChangeNotifierProvider(create: (_) => HistoryViewModel()),
@@ -99,6 +103,22 @@ class MyApp extends StatelessWidget {
         builder: (context, state) {
           final userData = state.extra as UserProfileM?;
           return AllBankAccountsScreen(userProfileM: userData);
+        },
+      ),
+      GoRoute(
+        name: K.withdrawScreen,
+        path: K.withdrawScreen,
+        builder: (context, state) {
+          final userData = state.extra as UserProfileM?;
+          return WithdrawalScreen(userProfileM: userData);
+        },
+      ),
+      GoRoute(
+        name: K.withdrawReceiptScreen,
+        path: K.withdrawReceiptScreen,
+        builder: (context, state) {
+          final withdrawalRecord = state.extra as WithdrawRecordM;
+          return WithdrawalReceiptScreen(withdrawalRecord: withdrawalRecord);
         },
       ),
       GoRoute(

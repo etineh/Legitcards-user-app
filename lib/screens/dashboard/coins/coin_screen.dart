@@ -17,6 +17,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 import '../../../Utilities/adjust_utils.dart';
 import '../../../Utilities/cloudinary_utils.dart';
 import '../../../data/models/user_model.dart';
+import '../../widgets/PrimaryButton.dart';
 
 class CoinScreen extends StatefulWidget {
   final UserProfileM? userProfileM;
@@ -485,6 +486,8 @@ class _CoinScreenState extends State<CoinScreen> {
           prefixIcon: Icons.monetization_on_outlined,
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
           textInputAction: TextInputAction.done,
+          focusedBorderColor:
+              _isAmountInvalid ? Colors.red : AppColors.lightPurple,
           // validator: _validationService.validateEmail,
         ),
       ],
@@ -613,7 +616,6 @@ class _CoinScreenState extends State<CoinScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // change the 3 to dynamic number according to asset
                 CustomText(
                   text: cryptoVM.toNairaRate,
                   color: context.blackWhite,
@@ -762,26 +764,26 @@ class _CoinScreenState extends State<CoinScreen> {
                 "Coin Name:",
                 selectedCoin ?? "",
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
 
               _buildSummaryItem(
                 "Network:",
                 selectedNetwork ?? "",
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
 
               _buildSummaryItem(
                 "Address:",
                 currentWalletAddress ?? "",
                 isAddress: true,
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
 
               _buildSummaryItem(
                 "Amount:",
                 "\$${_amountController.text}",
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
 
               _buildSummaryItem(
                 "You will receive:",
@@ -793,27 +795,11 @@ class _CoinScreenState extends State<CoinScreen> {
               // Sell Now Button
               SizedBox(
                 width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    _proceedWithTransaction();
-                    context.hideKeyboard();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.lightPurple,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: const Text(
-                    "Sell Now",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
+                child: PrimaryButton(
+                  backgroundColor: AppColors.lightPurple,
+                  onPressed: _showTradeSummary,
+                  text: "Sell Now",
+                  textStyle: const TextStyle(color: Colors.white, fontSize: 16),
                 ),
               ),
               const SizedBox(height: 10),

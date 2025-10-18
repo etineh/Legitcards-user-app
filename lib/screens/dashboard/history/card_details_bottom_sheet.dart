@@ -242,7 +242,8 @@ class CardDetailBottomSheet extends StatelessWidget {
 
           // Timestamp
           CustomText(
-            text: DateAndTimeUtils.formatTimestamp(transaction.createdAt),
+            text:
+                DateAndTimeUtils.formatToDateAndTimeLong(transaction.createdAt),
             size: 14,
             color: AppColors.white,
           ),

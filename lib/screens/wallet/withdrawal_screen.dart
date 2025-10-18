@@ -6,7 +6,6 @@ import 'package:legit_cards/constants/app_colors.dart';
 import 'package:legit_cards/data/models/wallet_model.dart';
 import 'package:legit_cards/extension/inbuilt_ext.dart';
 import 'package:legit_cards/screens/wallet/wallet_view_model.dart';
-import 'package:legit_cards/screens/wallet/withdrawal_receipt_screen.dart';
 import 'package:legit_cards/screens/widgets/app_bar.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:provider/provider.dart';
@@ -201,28 +200,17 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
         _amountController.clear();
         selectedAccount = null;
       });
-      // walletVM.fetchBalance(userProfileM, shouldLoad: false);
 
       // Convert WithdrawalDataM to WithdrawRecordM
       final withdrawRecord = WithdrawRecordM.fromWithdrawalData(res.data!);
 
       // Navigate to receipt screen
       // context.goNextScreenWithData(K.withdrawReceiptScreen, extra: withdrawRecord)
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => WithdrawalReceiptScreen(
-            withdrawalRecord: withdrawRecord,
-          ),
-        ),
+      GoRouter.of(context).pushReplacementNamed(
+        K.withdrawReceiptScreen,
+        // (route) => false, // Removes all routes until false is returned
+        extra: withdrawRecord,
       );
-
-      // Pop and return success with navigation instruction
-      // Navigator.pop(context, {
-      //   'success': true,
-      //   'navigateTo': 'history',
-      //   'historyTab': 2, // WITHDRAWS tab index
-      // });
     } else {
       if (kDebugMode) {
         print("General log: withdraw error  - ${res.status}");

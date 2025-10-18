@@ -62,9 +62,8 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  // In your router configuration
   final GoRouter _router = GoRouter(
-    initialLocation: K.dashboardScreen, // change later to home
+    initialLocation: K.loginPath, //K.dashboardScreen,
     routes: [
       GoRoute(
         name: K.dashboardScreen,

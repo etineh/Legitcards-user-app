@@ -10,7 +10,7 @@ plugins {
 
 android {
     namespace = "com.legitcardsusers"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 35  // ← Updated
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
@@ -23,14 +23,15 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.legitcardsusers"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
+        minSdk = 21  // ← Explicit value (or keep flutter.minSdkVersion)
+        targetSdk = 35  // ← Updated
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        // Add this for 16KB page size support
+        ndk {
+            abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
+        }
     }
 
     buildTypes {
@@ -41,7 +42,6 @@ android {
         }
     }
 }
-
 
 flutter {
     source = "../.."

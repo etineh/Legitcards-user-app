@@ -62,7 +62,7 @@ class CardDetailBottomSheet extends StatelessWidget {
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   // Transaction Status and ID
                   _buildStatusSection(context),
@@ -80,7 +80,19 @@ class CardDetailBottomSheet extends StatelessWidget {
                   if (transaction.status.toLowerCase() == 'pending' ||
                       transaction.status.toLowerCase() == 'selling')
                     _buildButton(context),
+
                   const SizedBox(height: 20),
+                  if (transaction.status.toLowerCase() == "selling")
+                    CustomText(
+                      text: "Cancel",
+                      onTap: () {
+                        Navigator.pop(context);
+                        context.hideKeyboard();
+                      },
+                      color: context.defaultColor,
+                      italic: true,
+                      underline: true,
+                    )
                 ],
               ),
             ),
@@ -95,10 +107,10 @@ class CardDetailBottomSheet extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
-          actionText == K.sellNow ? 'Trade Summary' : 'Transaction Status',
+          actionText == K.submitNow ? 'Trade Summary' : 'Transaction Status',
           style: TextStyle(
             fontSize: 16,
-            color: actionText == K.sellNow ? context.purpleText : Colors.grey,
+            color: actionText == K.submitNow ? context.purpleText : Colors.grey,
           ),
         ),
         Text(
@@ -233,10 +245,11 @@ class CardDetailBottomSheet extends StatelessWidget {
           ),
           _buildDetailRow('Quantity', '${transaction.quantity}'),
           if (transaction.status != "PENDING" &&
-              transaction.status != "CANCELLED")
+              transaction.status != "CANCELLED" &&
+              transaction.status != "SELLING")
             _buildDetailRow('Feedback', transaction.feedbacks.join("\n")),
 
-          _buildTransactionId(context),
+          if (transaction.status != "SELLING") _buildTransactionId(context),
 
           const SizedBox(height: 12),
 
@@ -276,7 +289,7 @@ class CardDetailBottomSheet extends StatelessWidget {
       width: double.infinity,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor: actionText == K.sellNow
+          backgroundColor: actionText == K.submitNow
               ? AppColors.lightPurple
               : context.cardColor,
           // foregroundColor: Colors.white,
@@ -286,7 +299,7 @@ class CardDetailBottomSheet extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 12),
         ),
         onPressed: () {
-          if (actionText == K.sellNow) {
+          if (actionText == K.submitNow) {
             Navigator.pop(context); // Close dialog
             onActionClick?.call();
             context.hideKeyboard(); // hide keyboard
@@ -299,7 +312,7 @@ class CardDetailBottomSheet extends StatelessWidget {
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
-            color: actionText == K.sellNow ? Colors.white : Colors.orange,
+            color: actionText == K.submitNow ? Colors.white : Colors.orange,
             letterSpacing: 0.5,
           ),
         ),

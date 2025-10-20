@@ -34,10 +34,11 @@ class HistoryViewModel extends ChangeNotifier {
   }) async {
     final response = await getResponse(
       _repository.getTradeHistory(payload, token, from: K.CARD),
+      shouldLoad: _cardHistory.isEmpty || CacheUtils.reloadCardTab,
     );
 
     if (response.statusCode == "TRADE_FOUND") {
-      _cardHistory = response.data ?? [];
+      _cardHistory = response.data;
       notifyListeners();
     } else if (response.statusCode == "AUTHENTICATION_FAILED") {
       if (context != null && context.mounted) {
@@ -45,9 +46,10 @@ class HistoryViewModel extends ChangeNotifier {
       }
     } else {
       if (context != null && context.mounted) {
-        context.toastMsg(response.message ?? "Error from server");
+        context.toastMsg(response.message);
       }
     }
+    CacheUtils.reloadCardTab = false;
   }
 
 // Fetch Coin History
@@ -58,10 +60,11 @@ class HistoryViewModel extends ChangeNotifier {
   }) async {
     final response = await getResponse(
       _repository.getTradeHistory(payload, token, from: K.COIN),
+      shouldLoad: _coinHistory.isEmpty,
     );
 
     if (response.statusCode == "TRADE_FOUND") {
-      _coinHistory = response.data ?? [];
+      _coinHistory = response.data;
       notifyListeners();
     } else if (response.statusCode == "AUTHENTICATION_FAILED") {
       if (context != null && context.mounted) {
@@ -69,7 +72,7 @@ class HistoryViewModel extends ChangeNotifier {
       }
     } else {
       if (context != null && context.mounted) {
-        context.toastMsg(response.message ?? "Error from server");
+        context.toastMsg(response.message);
       }
     }
   }
@@ -81,6 +84,7 @@ class HistoryViewModel extends ChangeNotifier {
   }) async {
     final response = await getResponse(
       _repository.fetchWithdrawRecords(userId),
+      shouldLoad: _withdrawRecords.isEmpty,
     );
 
     if (response.status == "success") {

@@ -88,11 +88,12 @@ class ProfileViewModel extends ChangeNotifier {
       notifyListeners();
       CacheUtils.myBankAccount = response.data!;
       notifyListeners();
-    } else if ((response.statusCode == "AUTHENTICATION_FAILED" ||
-            response.statusCode == "Failed") &&
-        context!.mounted) {
-      CacheUtils.logout(context);
     }
+    // else if ((response.statusCode == "AUTHENTICATION_FAILED" ||
+    //         response.statusCode == "Failed") &&
+    //     context!.mounted) {
+    //   CacheUtils.logout(context);
+    // }
   }
 
   Future<ProfileResponseM> deleteBankAccount(

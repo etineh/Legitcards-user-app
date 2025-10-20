@@ -27,7 +27,7 @@ class ActionCard extends StatelessWidget {
           decoration: BoxDecoration(
             color: context.cardColor,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: context.purpleText),
+            border: Border.all(color: context.purpleText.withOpacity(0.3)),
           ),
           padding: const EdgeInsets.all(15),
           child: Row(
@@ -36,7 +36,9 @@ class ActionCard extends StatelessWidget {
               Text(
                 text,
                 style: TextStyle(
-                  color: context.blackWhite,
+                  color: icon == Icons.delete
+                      ? Colors.redAccent
+                      : context.blackWhite,
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
                   letterSpacing: 1,
@@ -44,7 +46,9 @@ class ActionCard extends StatelessWidget {
               ),
               Icon(
                 icon,
-                color: context.purpleText,
+                color: icon == Icons.delete
+                    ? Colors.redAccent
+                    : context.purpleText,
                 size: 24,
               ),
             ],

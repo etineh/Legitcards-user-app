@@ -60,7 +60,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         user.username = _usernameController.text.trim();
         user.firstname = _firstNameController.text.trim();
         user.lastname = _lastNameController.text.trim();
-        SecureStorageRepo.saveUserProfile(user);
+        // SecureStorageRepo.saveUserProfile(user);
         context.goBack();
       }
     } catch (e) {

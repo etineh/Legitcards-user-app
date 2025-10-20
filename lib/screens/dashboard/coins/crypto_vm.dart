@@ -23,10 +23,6 @@ class CryptoViewModel extends ChangeNotifier {
   }) async {
     // Fetch when first time or force refresh
     if (_rates[coinName] == null) {
-      if (context != null && context.mounted) {
-        context.toastMsg("Fetching rate...", timeInSec: 2);
-      }
-
       // Fetch from repo - api
       final response = await getResponse(
         _repository.fetchCryptoRate(user, coinName),

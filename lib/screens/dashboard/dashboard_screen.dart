@@ -10,7 +10,6 @@ import 'package:provider/provider.dart';
 import '../../data/models/gift_card_trades_m.dart';
 import '../../data/repository/secure_storage_repo.dart';
 import '../profile/profile_view_model.dart';
-import '../wallet/withdrawal_screen.dart';
 import 'coins/coin_screen.dart';
 import 'gift_cards/gift_card_screen.dart';
 import 'gift_cards/gift_card_vm.dart';
@@ -37,13 +36,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     _loadUserProfile();
   }
 
-  // Add the onTabChange method
-  void onTabChange(int index) {
-    setState(() {
-      currentIndex = index;
-    });
-  }
-
   void updateSelectedCard(GiftCardAssetM card) {
     setState(() {
       selectedCard = card;
@@ -52,10 +44,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Future<void> _loadUserProfile() async {
-    final profile = await SecureStorageRepo.getUserProfile();
+    // final profile = await SecureStorageRepo.getUserProfile();
     if (!mounted) return;
     setState(() {
-      userProfileM = widget.userProfileM ?? profile;
+      userProfileM = widget.userProfileM; /* ?? profile */
     });
     // print("General log: What is userProfile $userProfileM");
 
@@ -97,49 +89,57 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (didPop, result) async {
-        _handleBackPress(didPop);
-      },
-      child: Scaffold(
-        backgroundColor: context.backgroundColor,
-        bottomNavigationBar: BottomNavigationBar(
-          currentIndex: currentIndex,
-          selectedItemColor: AppColors.lightPurple,
-          unselectedItemColor: Colors.grey,
-          type: BottomNavigationBarType.fixed, // important for text to show
-          showUnselectedLabels: true, // <— make sure unselected text shows
-          showSelectedLabels: true,
-          selectedLabelStyle: const TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 14,
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Theme.of(context).brightness == Brightness.dark
+            ? Brightness.light
+            : Brightness.dark,
+      ),
+      child: PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) async {
+          _handleBackPress(didPop);
+        },
+        child: Scaffold(
+          backgroundColor: context.backgroundColor,
+          bottomNavigationBar: BottomNavigationBar(
+            currentIndex: currentIndex,
+            selectedItemColor: AppColors.lightPurple,
+            unselectedItemColor: Colors.grey,
+            type: BottomNavigationBarType.fixed, // important for text to show
+            showUnselectedLabels: true, // <— make sure unselected text shows
+            showSelectedLabels: true,
+            selectedLabelStyle: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+            ),
+            unselectedLabelStyle: const TextStyle(
+              fontWeight: FontWeight.normal,
+              fontSize: 12,
+            ),
+            onTap: (index) {
+              setState(() {
+                currentIndex = index;
+              });
+            },
+            items: const [
+              BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+              BottomNavigationBarItem(
+                  icon: Icon(Icons.card_giftcard), label: "Cards"),
+              BottomNavigationBarItem(
+                  icon: Icon(Icons.currency_bitcoin), label: "Coins"),
+              BottomNavigationBarItem(
+                  icon: Icon(Icons.history), label: "History"),
+            ],
           ),
-          unselectedLabelStyle: const TextStyle(
-            fontWeight: FontWeight.normal,
-            fontSize: 12,
+          body: SafeArea(
+            child: _getBody(currentIndex, (index) {
+              setState(() {
+                currentIndex = index;
+              });
+            }),
           ),
-          onTap: (index) {
-            setState(() {
-              currentIndex = index;
-            });
-          },
-          items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.card_giftcard), label: "Cards"),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.currency_bitcoin), label: "Coins"),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.history), label: "History"),
-          ],
-        ),
-        body: SafeArea(
-          child: _getBody(currentIndex, (index) {
-            setState(() {
-              currentIndex = index;
-            });
-          }),
         ),
       ),
     );
@@ -156,7 +156,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
           userProfileM: userProfileM,
           onTabChange: onTabChange,
           onCardSelected: updateSelectedCard,
-          // onWithdrawalTap: _handleWithdrawalNavigation, // Pass the handler
         );
       case 1:
         return GiftCardScreen(
@@ -181,3 +180,26 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
   }
 }
+/*
+For more information about build configuration, see https://flutter.dev/to/review-gradle-config.
+Your project is configured to compile against Android SDK 34, but the following plugin(s) require to be compiled against a higher Android SDK version:
+- flutter_plugin_android_lifecycle compiles against Android SDK 35
+Fix this issue by compiling against the highest Android SDK version (they are backward compatible).
+Add the following to /Users/mac/AndroidStudioProjects/legit_cards/android/app/build.gradle:
+
+    android {
+        compileSdk = 35
+        ...
+    }
+
+This is a common issue! Samsung devices often need different APK architectures. Here are the solutions:
+Solution 1: Build Universal APK (Recommended for testing)
+bashflutter build apk --split-per-abi
+This creates separate APKs for different architectures in build/app/outputs/flutter-apk/:
+
+app-armeabi-v7a-release.apk (32-bit ARM - older devices)
+app-arm64-v8a-release.apk (64-bit ARM - most modern devices)
+app-x86_64-release.apk (Intel processors)
+
+Send the app-arm64-v8a-release.apk to HR - this works on most Samsung devices.
+ */

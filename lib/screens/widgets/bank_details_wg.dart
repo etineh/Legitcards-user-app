@@ -39,7 +39,7 @@ class BankDetailsCard extends StatelessWidget {
             decoration: BoxDecoration(
               color: context.cardColor,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: context.purpleText),
+              border: Border.all(color: context.purpleText.withOpacity(0.3)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

@@ -13,4 +13,7 @@ class CacheUtils {
 
   static List<BankAccount> myBankAccount = [];
   // List<BankAccount> get bankAccount => _bankAccount;
+
+  static String historyTab = K.CARD;
+  static bool reloadCardTab = false;
 }

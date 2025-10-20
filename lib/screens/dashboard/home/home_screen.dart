@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:legit_cards/Utilities/adjust_utils.dart';
 import 'package:legit_cards/constants/app_colors.dart';
 import 'package:legit_cards/extension/inbuilt_ext.dart';
+import 'package:legit_cards/screens/dashboard/coins/crypto_vm.dart';
 import 'package:legit_cards/screens/wallet/wallet_view_model.dart';
 import 'package:legit_cards/screens/widgets/custom_text.dart';
 import 'package:provider/provider.dart';
@@ -11,21 +12,18 @@ import '../../../constants/k.dart';
 import '../../../data/models/gift_card_trades_m.dart';
 import '../../../data/models/user_model.dart';
 import '../../../data/repository/secure_storage_repo.dart';
-import '../../wallet/withdrawal_screen.dart';
 import '../gift_cards/gift_card_vm.dart';
 
 class HomeScreen extends StatefulWidget {
   final UserProfileM? userProfileM;
   final Function(int)? onTabChange;
   final Function(GiftCardAssetM)? onCardSelected;
-  // final VoidCallback? onWithdrawalTap;
 
   const HomeScreen({
     super.key,
     required this.userProfileM,
     this.onTabChange,
     this.onCardSelected,
-    // this.onWithdrawalTap,
   });
 
   @override
@@ -36,27 +34,39 @@ class _HomeScreenState extends State<HomeScreen> {
   late final UserProfileM? userProfileM;
   late final Function(int)? onTabChange;
   late final Function(GiftCardAssetM)? onCardSelected;
-  // String walletBalance = "₦ 150,000.00";
   bool _isBalanceVisible = true;
 
   @override
   void initState() {
     // TODO: implement initState
-    userProfileM = widget.userProfileM!;
+    userProfileM = widget.userProfileM;
     onTabChange = widget.onTabChange;
     onCardSelected = widget.onCardSelected;
+    fetchCryptoRates();
     fetchBalance();
+
     super.initState();
   }
 
   void fetchBalance() {
-    WalletViewModel viewModel =
-        Provider.of<WalletViewModel>(context, listen: false);
-    viewModel.fetchBalance(userProfileM!, context: context);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final walletVM = Provider.of<WalletViewModel>(context, listen: false);
+      if (userProfileM == null) return;
+      walletVM.fetchBalance(userProfileM!, context: context);
+    });
+  }
+
+  void fetchCryptoRates() {
+    if (userProfileM == null) return;
+
+    CryptoViewModel cryptoVM =
+        Provider.of<CryptoViewModel>(context, listen: false);
+    cryptoVM.fetchCryptoRates(userProfileM!, "btc", shouldLoad: false);
   }
 
   @override
   Widget build(BuildContext context) {
+    // if (userProfileM == null) {return;}
     WalletViewModel walletVM = Provider.of<WalletViewModel>(context);
     return SingleChildScrollView(
       child: Container(
@@ -93,12 +103,12 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             InkWell(
               onTap: () async {
-                UserProfileM? userProfile =
-                    await SecureStorageRepo.getUserProfile();
+                // UserProfileM? userProfile =
+                //     await SecureStorageRepo.getUserProfile();
                 if (mounted) {
                   context.goNextScreenWithData(
                     K.profilePath,
-                    extra: userProfile!,
+                    extra: userProfileM!,
                   );
                 }
               },
@@ -110,7 +120,8 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(width: 10),
             CustomText(
-              text: "Hi, ${AdjustUtils.shortName(userProfileM!.firstname)}!",
+              text:
+                  "Hi, ${AdjustUtils.shortName(userProfileM?.firstname ?? "")}!",
               size: 18,
               shouldBold: true,
             )
@@ -120,17 +131,17 @@ class _HomeScreenState extends State<HomeScreen> {
         // RIGHT SIDE: Notification + Support icons
         Row(
           children: [
+            // InkWell(
+            //   onTap: () {
+            //     context.toastMsg("Notifications in progress");
+            //   },
+            //   borderRadius: BorderRadius.circular(20),
+            //   child: Icon(Icons.notifications_none, color: context.purpleText),
+            // ),
+            // const SizedBox(width: 20),
             InkWell(
               onTap: () {
-                context.toastMsg("Notifications in progress");
-              },
-              borderRadius: BorderRadius.circular(20),
-              child: Icon(Icons.notifications_none, color: context.purpleText),
-            ),
-            const SizedBox(width: 20),
-            InkWell(
-              onTap: () {
-                context.toastMsg("Support coming soon");
+                context.toastMsg("Live Support coming soon");
               },
               borderRadius: BorderRadius.circular(20),
               child: Icon(Icons.support_agent, color: context.purpleText),
@@ -264,42 +275,23 @@ class _HomeScreenState extends State<HomeScreen> {
                         color: Colors.white70,
                       ),
                       const SizedBox(width: 15),
-                      AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 200),
-                        child: Icon(
-                          _isBalanceVisible
-                              ? Icons.visibility_outlined
-                              : Icons.visibility_off_outlined,
-                          key: ValueKey(_isBalanceVisible),
-                          color: Colors.white70,
-                          size: 20,
-                        ),
+                      Icon(
+                        _isBalanceVisible
+                            ? Icons.visibility_outlined
+                            : Icons.visibility_off_outlined,
+                        key: ValueKey(_isBalanceVisible),
+                        color: Colors.white70,
+                        size: 20,
                       ),
                     ],
                   ),
                 ),
                 const SizedBox(height: 4),
-                AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 300),
-                  transitionBuilder: (child, animation) {
-                    return FadeTransition(
-                      opacity: animation,
-                      child: child,
-                    );
-                  },
-                  // if walletVM.isLoading -- rotate loading circle bar on the balance and show bal when false
-                  child: walletVM.isLoading
-                      ? const SizedBox(
-                          height: 25,
-                          width: 25,
-                          child: CircularProgressIndicator(
-                            color: Colors.white70,
-                            strokeWidth: 2.5,
-                          ),
-                        )
-                      : CustomText(
-                          key: ValueKey(
-                              '${_isBalanceVisible}_${walletVM.wallet?.balance}'),
+                Consumer<WalletViewModel>(
+                  builder: (context, walletVM, child) {
+                    return Row(
+                      children: [
+                        CustomText(
                           text: _isBalanceVisible
                               ? "₦${AdjustUtils.formatWithComma(walletVM.wallet?.balance ?? 0.00)}"
                               : "₦*******",
@@ -307,7 +299,21 @@ class _HomeScreenState extends State<HomeScreen> {
                           shouldBold: true,
                           color: Colors.white,
                         ),
-                ),
+                        if (walletVM.isLoading) ...[
+                          const SizedBox(width: 8),
+                          const SizedBox(
+                            height: 15,
+                            width: 15,
+                            child: CircularProgressIndicator(
+                              color: Colors.white70,
+                              strokeWidth: 2.5,
+                            ),
+                          ),
+                        ],
+                      ],
+                    );
+                  },
+                )
               ],
             ),
           ),
@@ -338,103 +344,110 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _hotCards() {
-    final giftCardVM = Provider.of<GiftCardTradeVM>(context, listen: false);
-    final allCategories = giftCardVM.assets;
+    return Consumer<GiftCardTradeVM>(
+      builder: (context, giftCardVM, child) {
+        final allCategories = giftCardVM.assets;
 
-    // 1️⃣ Get Apple, Steam, and Razer
-    final fixed = allCategories.where((c) {
-      final name = c.name.toLowerCase();
-      return name.contains("apple") ||
-          name.contains("steam") ||
-          name.contains("razor");
-    }).toList();
+        // 1️⃣ Get Apple, Steam, and Razer
+        final fixed = allCategories.where((c) {
+          final name = c.name.toLowerCase();
+          return name.contains("apple") ||
+              name.contains("steam") ||
+              name.contains("razor");
+        }).toList();
 
-// 2️⃣ Filter the four allowed for random pick
-    final allowedRandoms = allCategories.where((c) {
-      final name = c.name.toLowerCase();
-      return name.contains("footlocker") ||
-          name.contains("tremendous") ||
-          name.contains("sephora") ||
-          name.contains("macy");
-    }).toList();
+        // 2️⃣ Filter the four allowed for random pick
+        final allowedRandoms = allCategories.where((c) {
+          final name = c.name.toLowerCase();
+          return name.contains("footlocker") ||
+              name.contains("tremendous") ||
+              name.contains("sephora") ||
+              name.contains("macy");
+        }).toList();
 
-// 3️⃣ Shuffle and pick 2 random from those allowed
-    allowedRandoms.shuffle();
-    final randomTwo = allowedRandoms.take(2).toList();
+        // 3️⃣ Shuffle and pick 2 random from those allowed
+        allowedRandoms.shuffle();
+        final randomTwo = allowedRandoms.take(2).toList();
 
-// 4️⃣ Combine all together
-    final categories = [...fixed, ...randomTwo];
+        // 4️⃣ Combine all together
+        final categories = [...fixed, ...randomTwo];
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: CustomText(
-            text: "🔥 Hot Gift Cards",
-            color: context.purpleText,
-            shouldBold: true,
-          ),
-        ),
-        ListView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          itemCount: categories.length,
-          itemBuilder: (context, index) {
-            final category = categories[index];
-            return Container(
-              margin: const EdgeInsets.only(bottom: 8),
-              decoration: BoxDecoration(
-                color: context.cardColor,
-                borderRadius: BorderRadius.circular(12),
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: CustomText(
+                text: "🔥 Hot Gift Cards",
+                color: context.purpleText,
+                shouldBold: true,
               ),
-              child: ListTile(
-                leading: Container(
-                  width: 60,
+            ),
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              itemCount: categories.length,
+              itemBuilder: (context, index) {
+                final category = categories[index];
+
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 8),
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
+                    color: context.cardColor,
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  clipBehavior: Clip.antiAlias,
-                  child: CachedNetworkImage(
-                    imageUrl: category.images[0],
-                    fit: BoxFit.cover,
-                    placeholder: (context, url) => const Center(
-                      child: CircularProgressIndicator(strokeWidth: 2),
+                  child: ListTile(
+                    leading: Container(
+                      width: 60,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      clipBehavior: Clip.antiAlias,
+                      child: CachedNetworkImage(
+                        imageUrl: category.images[0],
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) => const Center(
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                        errorWidget: (context, url, error) =>
+                            const Icon(Icons.error, color: Colors.red),
+                      ),
                     ),
-                    errorWidget: (context, url, error) =>
-                        const Icon(Icons.error, color: Colors.red),
+                    title: CustomText(text: category.name, shouldBold: true),
+                    onTap: () {
+                      // open the card screen
+                      widget.onTabChange?.call(1);
+
+                      // pass the selected card to the screen
+                      final selected = categories[index];
+                      widget.onCardSelected?.call(selected);
+
+                      // fetch card rate
+                      giftCardVM.fetchAssetRates(
+                        userProfileM!,
+                        categories[index].id,
+                        context: context,
+                        shouldLoad: true,
+                      );
+                    },
                   ),
-                ),
-                title: CustomText(text: category.name, shouldBold: true),
-                onTap: () {
-                  // open the card screen
-                  widget.onTabChange?.call(1);
-                  // pass the select card to the screen
-                  final selected = categories[index];
-                  widget.onCardSelected?.call(selected);
-                  // fetch card rate
-                  giftCardVM.fetchAssetRates(
-                    userProfileM!,
-                    categories[index].id,
-                    context: context,
-                    shouldLoad: true,
-                  );
-                },
-              ),
-            );
-          },
-        ),
-        CustomText(
-          text: "open more...",
-          italic: true,
-          underline: true,
-          onTap: () {
-            onTabChange?.call(1);
-          },
-        ),
-        const SizedBox(height: 30),
-      ],
+                );
+              },
+            ),
+            CustomText(
+              text: "open more...",
+              italic: true,
+              color: context.purpleText,
+              underline: true,
+              onTap: () {
+                widget.onTabChange?.call(1);
+              },
+            ),
+            const SizedBox(height: 30),
+          ],
+        );
+      },
     );
   }
 }

@@ -88,12 +88,11 @@ class AuthViewModel extends ChangeNotifier {
     if (!context.mounted) return;
 
     if (signRes.statusCode == "AUTHENTICATED" && signRes.status == 200) {
-      context.toastMsg("Login Successful");
       final userProfileM = signRes.data!.first.userInfo!;
       userProfileM.token = signRes.data?.first.token;
       // print("General log: from login $userProfileM");
       // save userProfile data to local shareRef
-      SecureStorageRepo.saveUserProfile(userProfileM);
+      // SecureStorageRepo.saveUserProfile(userProfileM);
       // go to home screen
       context.goNextScreenWithData(K.dashboardScreen, extra: userProfileM);
     } else if (signRes.statusCode == "LOGIN_CODE_SENT" && goScreen) {

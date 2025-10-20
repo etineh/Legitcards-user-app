@@ -52,7 +52,7 @@ class _Enable2FaScreenState extends State<Enable2FaScreen> {
 
       if (profileR.statusCode == "2FA_ENABLED") {
         user.is2fa = true;
-        SecureStorageRepo.saveUserProfile(user);
+        // SecureStorageRepo.saveUserProfile(user);
         context.goBack();
       }
     } catch (e) {

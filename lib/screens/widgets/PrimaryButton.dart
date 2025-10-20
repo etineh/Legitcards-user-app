@@ -28,7 +28,7 @@ class PrimaryButton extends StatelessWidget {
     this.height = 50.0,
     this.width,
     this.borderRadius = 28.0,
-    this.backgroundColor,
+    this.backgroundColor = AppColors.lightPurple,
     this.foregroundColor,
     this.disabledBackgroundColor,
     this.padding,

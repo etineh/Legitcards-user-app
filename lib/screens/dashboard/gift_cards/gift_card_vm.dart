@@ -56,7 +56,6 @@ class GiftCardTradeVM extends ChangeNotifier {
       {bool shouldLoad = true, BuildContext? context}) async {
     // fetch when first time
     if (_rates[assetId] == null) {
-      if (context!.mounted) context.toastMsg("Fetching rate...", timeInSec: 2);
       // fetch from repo - api
       final response = await getResponse(
         _repository.fetchAssetRate(user, assetId),
@@ -66,7 +65,7 @@ class GiftCardTradeVM extends ChangeNotifier {
       if (response.statusCode == "RATE_FETCHED") {
         _rates[assetId] = response.data;
         notifyListeners();
-      } else if (context.mounted) {
+      } else if (context!.mounted) {
         context.toastMsg(response.message);
       }
     }

@@ -15,8 +15,10 @@ import 'package:legit_cards/screens/dashboard/dashboard_screen.dart';
 import 'package:legit_cards/screens/dashboard/gift_cards/gift_card_vm.dart';
 import 'package:legit_cards/screens/dashboard/history/history_view_model.dart';
 import 'package:legit_cards/screens/profile/add_bank_screen.dart';
+import 'package:legit_cards/screens/profile/advance_screen.dart';
 import 'package:legit_cards/screens/profile/all_bank_accounts_screen.dart';
 import 'package:legit_cards/screens/profile/change_password_screen.dart';
+import 'package:legit_cards/screens/profile/direct_support_screen.dart';
 import 'package:legit_cards/screens/profile/edit_profile_screen.dart';
 import 'package:legit_cards/screens/profile/enable_2fa_screen.dart';
 import 'package:legit_cards/screens/profile/profile_screen.dart';
@@ -95,6 +97,19 @@ class MyApp extends StatelessWidget {
         name: K.requestCode,
         path: K.requestCode,
         builder: (context, state) => const RequestCodeScreen(),
+      ),
+      GoRoute(
+        name: K.advanceScreen,
+        path: K.advanceScreen,
+        builder: (context, state) {
+          final userData = state.extra as UserProfileM;
+          return AdvanceScreen(user: userData);
+        },
+      ),
+      GoRoute(
+        name: K.directSupportScreen,
+        path: K.directSupportScreen,
+        builder: (context, state) => const DirectSupportScreen(),
       ),
       GoRoute(
         name: K.viewBankAccount,

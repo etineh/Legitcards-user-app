@@ -22,10 +22,10 @@ class K {
   static const viewBankAccount = "/view-bank-account";
   static const withdrawScreen = "/withdraw";
   static const withdrawReceiptScreen = "/withdraw-receipt";
-  // static const login2Fa = "/login2fa";
-  // static const login2Fa = "/login2fa";
+  static const directSupportScreen = "/directSupport";
+  static const advanceScreen = "/advance";
 
-  static const sellNow = "Sell Now";
+  static const submitNow = "Submit Now";
   static const cancelTransaction = "Cancel Transaction";
   static const optInfo =
       "Please check your spam folder if not received in your inbox";
@@ -47,6 +47,8 @@ class K {
 
   static const CARD = "CARD";
   static const COIN = "CRYPTO";
+
+  static const VERSION = "1.23";
 
   static bool isAndroid() {
     return Platform.isAndroid;

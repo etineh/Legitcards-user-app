@@ -5,7 +5,6 @@ import 'package:legit_cards/data/models/wallet_model.dart';
 import 'package:legit_cards/extension/inbuilt_ext.dart';
 
 import '../../../data/repository/app_repository.dart';
-import '../../../data/repository/share_ref_repo.dart';
 
 class WalletViewModel extends ChangeNotifier {
   final AppRepository _repository = AppRepository();
@@ -25,7 +24,10 @@ class WalletViewModel extends ChangeNotifier {
       _wallet = response.wallet;
       notifyListeners();
     } else if (response.statusCode == "AUTHENTICATION_FAILED") {
-      if (context!.mounted) CacheUtils.logout(context);
+      if (context!.mounted) {
+        context.toastMsg("Login fail to fetch balance");
+        CacheUtils.logout(context);
+      }
     } else if (context!.mounted) {
       // print("General log: Error fetching balance ${response.message}");
       context.toastMsg(response.message ?? "Error from server");
@@ -38,30 +40,30 @@ class WalletViewModel extends ChangeNotifier {
   }
 
 // Initialize the list to avoid null issues
-  List<WithdrawRecordM> _withdrawRecords = [];
-  List<WithdrawRecordM> get withdrawRecords => _withdrawRecords;
-
-  Future<void> fetchWithdrawRecords(
-    String userId, {
-    BuildContext? context,
-  }) async {
-    final response = await getResponse(
-      _repository.fetchWithdrawRecords(userId),
-    );
-
-    if (response.status == "success") {
-      _withdrawRecords = response.record ?? [];
-      notifyListeners();
-    } else if (response.status == "AUTHENTICATION_FAILED") {
-      if (context != null && context.mounted) {
-        CacheUtils.logout(context);
-      }
-    } else {
-      if (context != null && context.mounted) {
-        context.toastMsg(response.message ?? "Error from server");
-      }
-    }
-  }
+//   List<WithdrawRecordM> _withdrawRecords = [];
+//   List<WithdrawRecordM> get withdrawRecords => _withdrawRecords;
+//
+//   Future<void> fetchWithdrawRecords(
+//     String userId, {
+//     BuildContext? context,
+//   }) async {
+//     final response = await getResponse(
+//       _repository.fetchWithdrawRecords(userId),
+//     );
+//
+//     if (response.status == "success") {
+//       _withdrawRecords = response.record ?? [];
+//       notifyListeners();
+//     } else if (response.status == "AUTHENTICATION_FAILED") {
+//       if (context != null && context.mounted) {
+//         CacheUtils.logout(context);
+//       }
+//     } else {
+//       if (context != null && context.mounted) {
+//         context.toastMsg(response.message ?? "Error from server");
+//       }
+//     }
+//   }
 
   // reusable function
   Future<T> getResponse<T>(Future<T> repoCall, {bool shouldLoad = true}) async {

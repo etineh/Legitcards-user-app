@@ -35,7 +35,7 @@ class CoinScreen extends StatefulWidget {
 
 class _CoinScreenState extends State<CoinScreen> {
   late UserProfileM userProfileM;
-  late final Function(int)? onTabChange; // unused yet
+  late final Function(int)? onTabChange;
 
   String? selectedCoin;
   String? selectedNetwork;
@@ -66,7 +66,11 @@ class _CoinScreenState extends State<CoinScreen> {
   @override
   void initState() {
     userProfileM = widget.userProfileM!;
-    onTabChange = widget.onTabChange; // unused yet
+    onTabChange = widget.onTabChange;
+
+    setState(() {
+      selectedCoin = K.BTC;
+    });
 
     super.initState();
   }
@@ -242,7 +246,7 @@ class _CoinScreenState extends State<CoinScreen> {
 
                 // steps of images uploads
                 _imageInfo(),
-                const SizedBox(height: 5),
+                const SizedBox(height: 15),
 
                 // Upload Image Section
                 _buildImageUploadSection(),
@@ -483,6 +487,7 @@ class _CoinScreenState extends State<CoinScreen> {
           controller: _amountController,
           labelText: "Enter ${selectedCoin ?? 'USDT'} Amount",
           hintText: _getRange(cryptoVM),
+          hintTextColor: context.defaultColor.withOpacity(0.3),
           prefixIcon: Icons.monetization_on_outlined,
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
           textInputAction: TextInputAction.done,
@@ -625,11 +630,6 @@ class _CoinScreenState extends State<CoinScreen> {
                 Icon(Icons.info_outline, color: Colors.grey[600], size: 16),
               ],
             ),
-          ),
-          CustomText(
-            text: "You will receive:",
-            color: context.defaultColor,
-            size: 14,
           ),
           // const SizedBox(height: 8),
           Text(
@@ -797,8 +797,8 @@ class _CoinScreenState extends State<CoinScreen> {
                 width: double.infinity,
                 child: PrimaryButton(
                   backgroundColor: AppColors.lightPurple,
-                  onPressed: _showTradeSummary,
-                  text: "Sell Now",
+                  onPressed: _proceedWithTransaction,
+                  text: "Submit Now",
                   textStyle: const TextStyle(color: Colors.white, fontSize: 16),
                 ),
               ),
@@ -825,6 +825,8 @@ class _CoinScreenState extends State<CoinScreen> {
 
   Future<void> _proceedWithTransaction() async {
     context.hideKeyboard();
+    Navigator.pop(context);
+    context.hideKeyboard();
     final cryptoVM = Provider.of<CryptoViewModel>(context, listen: false);
 
     // Validate amount is within range
@@ -843,6 +845,7 @@ class _CoinScreenState extends State<CoinScreen> {
     }
 
     cryptoVM.setIsLoadToTrue();
+    context.hideKeyboard();
 
     if (mounted) {
       context.toastMsg("Uploading image(s)... [1/2]", color: Colors.green);
@@ -905,10 +908,11 @@ class _CoinScreenState extends State<CoinScreen> {
     // Handle different response codes
     switch (response.statusCode) {
       case "TRADE_SAVED":
-        context.toastMsg("Trade successful!", color: Colors.green);
+        context.toastMsg("Trade submitted!", color: Colors.green);
         resetForm();
         // Navigate to history tab
-        // onTabChange?.call(1);
+        CacheUtils.historyTab = K.COIN;
+        onTabChange?.call(3);
         break;
 
       case "AUTHENTICATION_FAILED":
@@ -939,3 +943,9 @@ class _CoinScreenState extends State<CoinScreen> {
     });
   }
 }
+
+/*
+1. Send your BTC to the wallet address provided here.
+2. After sending, upload your transaction proof and click on proceed to submit your trade.
+3.  Will be the current note
+ */

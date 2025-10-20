@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:legit_cards/Utilities/adjust_utils.dart';
+import 'package:legit_cards/Utilities/cache_utils.dart';
 import 'package:legit_cards/constants/k.dart';
 import 'package:legit_cards/data/models/gift_card_trades_m.dart';
 import 'package:legit_cards/extension/inbuilt_ext.dart';
@@ -105,6 +106,35 @@ class _GiftCardScreenState extends State<GiftCardScreen> {
         calculatedRate = amount * (selectedRate?.rate ?? 0) * _quantity;
       });
     }
+  }
+
+  bool isAmong3Uploads() {
+    const allowedCards = [
+      'Master',
+      'vanilla master',
+      'Vanilla visa',
+      'Visa',
+      'Walmart visa',
+      'American express',
+    ];
+
+    // assuming selectedCardAsset.name is a String variable accessible in this scope
+    final cardName = selectedCardAsset?.name.trim().toLowerCase();
+
+    // check if the name matches any allowed card (case-insensitive)
+    return allowedCards.any((c) => c.toLowerCase() == cardName);
+  }
+
+  bool isAmong2Uploads() {
+    const allowedCards = [
+      'Amazon',
+    ];
+
+    // assuming selectedCardAsset.name is a String variable accessible in this scope
+    final cardName = selectedCardAsset?.name.trim().toLowerCase();
+
+    // check if the name matches any allowed card (case-insensitive)
+    return allowedCards.any((c) => c.toLowerCase() == cardName);
   }
 
   final ImagePicker _picker = ImagePicker();
@@ -218,7 +248,10 @@ class _GiftCardScreenState extends State<GiftCardScreen> {
         ),
         const SizedBox(height: 16),
         Expanded(
-          child: _build2GridCardList(viewModel),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 30.0),
+            child: _build2GridCardList(viewModel),
+          ),
         ),
         const SizedBox(height: 5),
       ],
@@ -264,7 +297,7 @@ class _GiftCardScreenState extends State<GiftCardScreen> {
 
               // require number of images
               _imageInfo(),
-              const SizedBox(height: 5),
+              const SizedBox(height: 15),
 
               // Upload images section
               _buildImageUploadSection(),
@@ -316,13 +349,37 @@ class _GiftCardScreenState extends State<GiftCardScreen> {
           ),
           selectedCardAsset?.specialInfo == null
               ? const SizedBox.shrink()
-              : CustomText(
-                  text: selectedCardAsset!.specialInfo!,
-                  color: context.purpleText,
-                  size: 12,
-                ),
+              : _buildWarningMessage(selectedCardAsset!.specialInfo!),
         ],
       ),
+    );
+  }
+
+  Widget _buildWarningMessage(String warning) {
+    return Column(
+      children: [
+        const SizedBox(height: 8),
+        Container(
+          padding: const EdgeInsets.all(5),
+          decoration: BoxDecoration(
+            color: Colors.orange.shade50,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.orange.shade200),
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.warning_amber_rounded, color: Colors.orange.shade700),
+              const SizedBox(width: 8),
+              Expanded(
+                  child: CustomText(
+                text: warning,
+                size: 12,
+                color: Colors.black,
+              )),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
@@ -433,8 +490,8 @@ class _GiftCardScreenState extends State<GiftCardScreen> {
               const BoxConstraints(minWidth: 0, minHeight: 0),
           hintText: selectedRate == null
               ? 'Card Amount'
-              : "Range amount: ${selectedRate!.from} to ${selectedRate!.to}",
-          hintStyle: TextStyle(color: Colors.grey[600]),
+              : "Enter amount: ${selectedRate!.from.toInt()} to ${selectedRate!.to.toInt()}",
+          hintStyle: TextStyle(color: context.defaultColor.withOpacity(0.2)),
           border: InputBorder.none,
         ),
         style: TextStyle(fontSize: 16, color: context.blackWhite),
@@ -505,11 +562,6 @@ class _GiftCardScreenState extends State<GiftCardScreen> {
                   color: context.defaultColor,
                   size: 14,
                 ),
-          CustomText(
-            text: "You will receive:",
-            color: context.defaultColor,
-            size: 14,
-          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -578,49 +630,57 @@ class _GiftCardScreenState extends State<GiftCardScreen> {
                 child: Column(
                   children: [
                     Icon(Icons.upload, color: context.whiteBlack, size: 30),
-                    CustomText(text: "Frontside", color: context.whiteBlack),
+                    CustomText(
+                        text: isAmong3Uploads()
+                            ? "Frontside"
+                            : isAmong2Uploads()
+                                ? "  Card  "
+                                : "Upload",
+                        color: context.whiteBlack),
                   ],
                 ),
               ),
             ),
             const SizedBox(width: 10),
-            GestureDetector(
-              onTap: _showPickerOptions,
-              child: Container(
-                // width: 85,
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: context.purpleText,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: context.purpleText, width: 2),
-                ),
-                child: Column(
-                  children: [
-                    Icon(Icons.upload, color: context.whiteBlack, size: 30),
-                    CustomText(text: "Backside", color: context.whiteBlack),
-                  ],
+            if (isAmong3Uploads())
+              GestureDetector(
+                onTap: _showPickerOptions,
+                child: Container(
+                  // width: 85,
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: context.purpleText,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: context.purpleText, width: 2),
+                  ),
+                  child: Column(
+                    children: [
+                      Icon(Icons.upload, color: context.whiteBlack, size: 30),
+                      CustomText(text: "Backside", color: context.whiteBlack),
+                    ],
+                  ),
                 ),
               ),
-            ),
             const SizedBox(width: 10),
-            GestureDetector(
-              onTap: _showPickerOptions,
-              child: Container(
-                // width: 85,
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: context.purpleText,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: context.purpleText, width: 2),
-                ),
-                child: Column(
-                  children: [
-                    Icon(Icons.upload, color: context.whiteBlack, size: 30),
-                    CustomText(text: "Receipt", color: context.whiteBlack),
-                  ],
+            if (isAmong3Uploads() || isAmong2Uploads())
+              GestureDetector(
+                onTap: _showPickerOptions,
+                child: Container(
+                  // width: 85,
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: context.purpleText,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: context.purpleText, width: 2),
+                  ),
+                  child: Column(
+                    children: [
+                      Icon(Icons.upload, color: context.whiteBlack, size: 30),
+                      CustomText(text: "Receipt", color: context.whiteBlack),
+                    ],
+                  ),
                 ),
               ),
-            ),
           ],
         ),
 
@@ -852,6 +912,7 @@ class _GiftCardScreenState extends State<GiftCardScreen> {
               // fetch rate
               viewModel.fetchAssetRates(userProfileM, category.id,
                   context: context, shouldLoad: true);
+              context.hideKeyboard(); // hide keyboard
             },
           ),
         );
@@ -889,7 +950,7 @@ class _GiftCardScreenState extends State<GiftCardScreen> {
       physics: const AlwaysScrollableScrollPhysics(),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        crossAxisSpacing: 10,
+        crossAxisSpacing: 2,
         mainAxisSpacing: 20,
         childAspectRatio: 2.2,
       ),
@@ -967,6 +1028,7 @@ class _GiftCardScreenState extends State<GiftCardScreen> {
                       });
                       Navigator.pop(context);
                       _calculateRate();
+                      context.hideKeyboard(); // hide keyboard
                     },
                     child: Container(
                       margin: const EdgeInsets.only(bottom: 12),
@@ -1037,6 +1099,7 @@ class _GiftCardScreenState extends State<GiftCardScreen> {
                       });
                       Navigator.pop(context);
                       _calculateRate();
+                      context.hideKeyboard(); // hide keyboard
                     },
                     child: Container(
                       margin: const EdgeInsets.only(bottom: 12),
@@ -1093,6 +1156,14 @@ class _GiftCardScreenState extends State<GiftCardScreen> {
 
   void _showTradeSummary() {
     if (mounted) context.hideKeyboard(); // hide keyboard
+    if ((isAmong3Uploads() && uploadedImages.length < 3)) {
+      context.toastMsg("This card requires 3 images");
+      return;
+    }
+    if ((isAmong2Uploads() && uploadedImages.length < 2)) {
+      context.toastMsg("This card requires 2 images");
+      return;
+    }
     final transaction = GiftCardTradeM(
       id: '', // not yet created — leave empty or temp
       assetName: selectedCardAsset!.name,
@@ -1112,7 +1183,7 @@ class _GiftCardScreenState extends State<GiftCardScreen> {
       // countryInfo: selectedRate!.countryInfo,
     );
 
-    CardDetailBottomSheet.show(context, transaction, K.sellNow, () async {
+    CardDetailBottomSheet.show(context, transaction, K.submitNow, () async {
       _proceedTransaction();
     });
   }
@@ -1157,14 +1228,14 @@ class _GiftCardScreenState extends State<GiftCardScreen> {
       }
 
       // All uploads completed successfully
-      sellCard(giftCardVM);
+      _sellCard(giftCardVM);
     } catch (e) {
       giftCardVM.setIsLoadToFalse();
       if (mounted) context.toastMsg("Upload failed: $e", color: Colors.red);
     }
   }
 
-  Future<void> sellCard(GiftCardTradeVM giftCardVM) async {
+  Future<void> _sellCard(GiftCardTradeVM giftCardVM) async {
     if (mounted) {
       context.toastMsg("Processing card... [2/2]", color: Colors.green);
       context.hideKeyboard(); // hide keyboard
@@ -1185,8 +1256,9 @@ class _GiftCardScreenState extends State<GiftCardScreen> {
     if (mounted) context.toastMsg(giftRes.message);
 
     if (giftRes.statusCode == "TRADE_SAVED") {
-      if (mounted) context.toastMsg("Trade successful!");
+      if (mounted) context.toastMsg("Trade submitted!", color: Colors.green);
       // go to history
+      CacheUtils.reloadCardTab = true;
       onTabChange?.call(3);
     }
     // print("General log: the total link image is - $uploadedUrls");

@@ -94,8 +94,7 @@ class InputField extends StatelessWidget {
           labelText: labelText,
           hintText: hintText,
           labelStyle: TextStyle(
-            color: Colors.grey[600],
-            fontWeight: FontWeight.w500,
+            color: context.defaultColor.withOpacity(0.3),
           ),
           hintStyle: TextStyle(
             color: hintTextColor ?? Colors.grey[400], // customizable hint color

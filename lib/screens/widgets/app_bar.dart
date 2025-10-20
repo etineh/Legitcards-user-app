@@ -17,8 +17,20 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: AppColors.primaryPurple,
+      backgroundColor: Colors.transparent, // Make background transparent
       elevation: 0,
+      flexibleSpace: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Color(0xFFBF2882), // light purple
+              Color(0xFF5B2C98), // deep indigo
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+      ),
       leading: IconButton(
         icon: Icon(K.isAndroid() ? Icons.arrow_back : Icons.arrow_back_ios,
             color: Colors.white),

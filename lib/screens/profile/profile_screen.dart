@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:legit_cards/Utilities/cache_utils.dart';
 import 'package:legit_cards/constants/k.dart';
-import 'package:legit_cards/data/models/user_bank_model.dart';
 import 'package:legit_cards/data/models/user_model.dart';
 import 'package:legit_cards/data/repository/secure_storage_repo.dart';
 import 'package:legit_cards/extension/inbuilt_ext.dart';
@@ -40,10 +39,6 @@ class _ProfileScreenState extends State<ProfileScreen> with RouteAware {
       ProfileViewModel viewModel =
           Provider.of<ProfileViewModel>(context, listen: false);
       viewModel.getMyBankInfo(user);
-      print(
-          "General log: the bank list is empty: recall - ${CacheUtils.myBankAccount}");
-    } else {
-      print("General log: the bank list is $CacheUtils.myBankAccount");
     }
   }
 
@@ -197,22 +192,34 @@ class _ProfileScreenState extends State<ProfileScreen> with RouteAware {
 
               // Support Section
               _text("Support"),
-              const SizedBox(height: 10),
-
-              // Tickets
-              ActionCard(
-                text: "Tickets",
-                onTap: () {
-                  context.toastMsg("2Fa");
-                },
-              ),
+              // const SizedBox(height: 10),
+              //
+              // // Tickets
+              // ActionCard(
+              //   text: "Tickets",
+              //   onTap: () {
+              //     context.toastMsg("2Fa");
+              //   },
+              // ),
 
               const SizedBox(height: 10),
 
               // Direct Support
               ActionCard(
                 text: "Direct Support",
-                onTap: () {},
+                onTap: () => context.goNextScreen(K.directSupportScreen),
+              ),
+
+              const SizedBox(height: 30),
+
+              // More - to include 'delete account'
+              _text("More"),
+              const SizedBox(height: 10),
+
+              ActionCard(
+                text: "Advance",
+                onTap: () =>
+                    context.goNextScreenWithData(K.advanceScreen, extra: user),
               ),
 
               const SizedBox(height: 30),
@@ -228,7 +235,7 @@ class _ProfileScreenState extends State<ProfileScreen> with RouteAware {
               // Version
               Center(
                 child: Text(
-                  'Version 1.22.0 (16011)',
+                  'Version 1.23.0 (16011)',
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.grey[500],
@@ -337,7 +344,7 @@ class _ProfileScreenState extends State<ProfileScreen> with RouteAware {
       decoration: BoxDecoration(
         color: context.cardColor,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: context.purpleText),
+        border: Border.all(color: context.purpleText.withOpacity(0.3)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,

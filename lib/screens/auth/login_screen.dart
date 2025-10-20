@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:legit_cards/constants/app_colors.dart';
 import 'package:legit_cards/constants/k.dart';
 import 'package:legit_cards/data/models/auth_model.dart';
 import 'package:legit_cards/extension/inbuilt_ext.dart';
@@ -85,14 +86,17 @@ class _SigninScreenState extends State<LoginScreen> {
                   Center(
                     child: Column(
                       children: [
-                        const LogoWidget(size: 100.0),
+                        const LogoWidget(
+                          size: 100.0,
+                          backgroundColor: AppColors.lightPurple,
+                        ),
                         const SizedBox(height: 10),
                         Text(
                           'LegitCards',
                           style: TextStyle(
                             fontSize: 32,
                             fontWeight: FontWeight.bold,
-                            color: context.blackWhite,
+                            color: context.purpleText,
                           ),
                         ),
                       ],

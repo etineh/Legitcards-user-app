@@ -1,9 +1,9 @@
 import 'dart:math';
 import 'dart:io';
-import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:legit_cards/constants/app_colors.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 
@@ -113,7 +113,7 @@ class AdjustUtils {
       case 'pending':
         return Colors.orange;
       case 'selling':
-        return Colors.orange;
+        return AppColors.primaryPurple;
       case 'completed':
       case 'success':
         return Colors.green;

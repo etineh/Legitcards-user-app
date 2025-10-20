@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:legit_cards/Utilities/adjust_utils.dart';
+import 'package:legit_cards/Utilities/cache_utils.dart';
 import 'package:legit_cards/Utilities/date_utils.dart';
 import 'package:legit_cards/constants/app_colors.dart';
 import 'package:legit_cards/data/models/wallet_model.dart';
@@ -35,9 +36,19 @@ class _HistoryScreenState extends State<HistoryScreen>
     super.initState();
     user = widget.userProfileM!;
     _tabController = TabController(length: 3, vsync: this);
-    _fetchCardAndCryptoTransactions();
-    _fetchCardAndCryptoTransactions();
-    _fetchWithdrawTransactions();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _fetchCardAndCryptoTransactions();
+      _fetchCardAndCryptoTransactions();
+      _fetchWithdrawTransactions();
+    });
+    _navigateToCoinTab();
+  }
+
+  void _navigateToCoinTab() {
+    if (CacheUtils.historyTab == K.COIN) {
+      _tabController.index = 1; // ✅ navigate the tab index
+      CacheUtils.historyTab = K.CARD;
+    }
   }
 
   Future<void> _fetchCardAndCryptoTransactions() async {
@@ -54,6 +65,7 @@ class _HistoryScreenState extends State<HistoryScreen>
     };
 
     viewModel.fetchCardHistory(payload, user!.token!, context: context);
+    if (CacheUtils.historyTab == K.COIN) viewModel.coinHistory.clear();
     viewModel.fetchCoinHistory(payload, user!.token!, context: context);
   }
 
@@ -70,34 +82,39 @@ class _HistoryScreenState extends State<HistoryScreen>
 
   @override
   Widget build(BuildContext context) {
-    final historyViewModel = Provider.of<HistoryViewModel>(context);
-
-    return ModalProgressHUD(
-      inAsyncCall: historyViewModel.isLoading,
-      child: Scaffold(
-        backgroundColor: context.backgroundColor,
-        body: Expanded(
-          child: Column(
-            children: [
-              const SizedBox(height: 10),
-              // Tab Bar
-              _buildTabBar(),
-              const SizedBox(height: 16),
-              // Tab Content
-              Expanded(
-                child: TabBarView(
-                  controller: _tabController,
-                  children: [
-                    _buildCardsTab(historyViewModel),
-                    _buildCoinsTab(historyViewModel),
-                    _buildWithdrawTab(historyViewModel),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
+    return Consumer<HistoryViewModel>(
+      child: Column(
+        children: [
+          const SizedBox(height: 10),
+          _buildTabBar(), // This won't rebuild when historyViewModel changes
+          const SizedBox(height: 16),
+        ],
       ),
+      builder: (context, historyViewModel, staticChild) {
+        return Scaffold(
+          backgroundColor: context.backgroundColor,
+          body: ModalProgressHUD(
+            inAsyncCall: historyViewModel.isLoading,
+            child: Column(
+              children: [
+                staticChild!, // Reuses the static widgets
+
+                // Tab Content
+                Expanded(
+                  child: TabBarView(
+                    controller: _tabController,
+                    children: [
+                      _buildCardsTab(historyViewModel),
+                      _buildCoinsTab(historyViewModel),
+                      _buildWithdrawTab(historyViewModel),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -110,6 +127,8 @@ class _HistoryScreenState extends State<HistoryScreen>
       ),
       child: TabBar(
         controller: _tabController,
+        // isScrollable: true, // Add this
+        tabAlignment: TabAlignment.fill, // Add this for even distribution
         indicator: BoxDecoration(
           color: Colors.white.withOpacity(0.3),
           borderRadius: BorderRadius.circular(25),

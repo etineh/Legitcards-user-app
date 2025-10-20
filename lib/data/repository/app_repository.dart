@@ -97,16 +97,16 @@ class AppRepository {
   Future<ProfileResponseM> getMyProfile(UserProfileM user) async {
     try {
       var userRes = await _profileApi.getMyProfile(user);
-      if (userRes.statusCode == "USER_FOUND") {
-        // get old profile first
-        final oldProfile = await SecureStorageRepo.getUserProfile();
+      // if (userRes.statusCode == "USER_FOUND") {
+      // get old profile first
+      // final oldProfile = await SecureStorageRepo.getUserProfile();
 
-        // preserve token if missing
-        if (userRes.data != null) {
-          userRes.data!.token ??= oldProfile?.token;
-          await SecureStorageRepo.saveUserProfile(userRes.data!);
-        }
-      }
+      // preserve token if missing
+      // if (userRes.data != null) {
+      //   userRes.data!.token ??= oldProfile?.token;
+      //   // await SecureStorageRepo.saveUserProfile(userRes.data!);
+      // }
+      // }
       return userRes;
     } catch (e) {
       return checkError(e,

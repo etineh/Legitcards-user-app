@@ -186,7 +186,7 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
       "user_id": userProfileM.userid,
       "pin": pin,
       "id": userProfileM.userid,
-      "version": K.VERSION,
+      "version": K.VERSION_NAME,
     };
 
     WalletViewModel walletVM =

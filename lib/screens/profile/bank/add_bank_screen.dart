@@ -8,8 +8,8 @@ import 'package:legit_cards/screens/widgets/custom_text.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:provider/provider.dart';
 
-import '../../data/models/user_model.dart';
-import '../widgets/InputField.dart';
+import '../../../data/models/user_model.dart';
+import '../../widgets/InputField.dart';
 
 class AddBankAccountScreen extends StatefulWidget {
   final UserProfileM? user;
@@ -54,7 +54,7 @@ class _AddBankAccountScreenState extends State<AddBankAccountScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.primaryPurple,
+      // backgroundColor: AppColors.primaryPurple, // can here be gradient colour?
       appBar: CustomAppBar(
         title: 'Add bank Account',
         onBack: () {
@@ -67,12 +67,24 @@ class _AddBankAccountScreenState extends State<AddBankAccountScreen> {
           }
         },
       ),
-      body: Consumer<ProfileViewModel>(
-        builder: (context, viewModel, child) {
-          return _showBankList
-              ? _buildBankList(viewModel) // bank list for dropdown
-              : _buildAddBankForm(viewModel); // account number field | button
-        },
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Color(0xFFBF2882), // light purple
+              Color(0xFF5B2C98), // deep indigo // deep indigo
+            ],
+            begin: Alignment.topLeft,
+            // end: Alignment.bottomRight,
+          ),
+        ),
+        child: Consumer<ProfileViewModel>(
+          builder: (context, viewModel, child) {
+            return _showBankList
+                ? _buildBankList(viewModel) // bank list for dropdown
+                : _buildAddBankForm(viewModel); // account number field | button
+          },
+        ),
       ),
     );
   }
@@ -130,7 +142,8 @@ class _AddBankAccountScreenState extends State<AddBankAccountScreen> {
                   decoration: BoxDecoration(
                     color: context.cardColor,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.grey[300]!),
+                    border:
+                        Border.all(color: Colors.grey[300]!.withOpacity(0.3)),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -176,7 +189,7 @@ class _AddBankAccountScreenState extends State<AddBankAccountScreen> {
                       : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primaryPurple,
-                    disabledBackgroundColor: Colors.grey[300],
+                    disabledBackgroundColor: context.backgroundGray,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -184,10 +197,13 @@ class _AddBankAccountScreenState extends State<AddBankAccountScreen> {
                   ),
                   child: Text(
                     _isVerified ? 'Add Bank Account' : 'Verify Account',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
-                      color: Colors.white,
+                      color: (_selectedBank != null &&
+                              _accountNumberController.text.isNotEmpty)
+                          ? Colors.white
+                          : Colors.grey.shade600,
                     ),
                   ),
                 ),

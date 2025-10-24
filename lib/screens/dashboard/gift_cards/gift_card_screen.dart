@@ -118,7 +118,6 @@ class _GiftCardScreenState extends State<GiftCardScreen> {
       'American express',
     ];
 
-    // assuming selectedCardAsset.name is a String variable accessible in this scope
     final cardName = selectedCardAsset?.name.trim().toLowerCase();
 
     // check if the name matches any allowed card (case-insensitive)
@@ -130,7 +129,6 @@ class _GiftCardScreenState extends State<GiftCardScreen> {
       'Amazon',
     ];
 
-    // assuming selectedCardAsset.name is a String variable accessible in this scope
     final cardName = selectedCardAsset?.name.trim().toLowerCase();
 
     // check if the name matches any allowed card (case-insensitive)
@@ -205,7 +203,7 @@ class _GiftCardScreenState extends State<GiftCardScreen> {
     final giftCardVM = Provider.of<GiftCardTradeVM>(context);
 
     return transferSelectCard == null
-        ? _buildCardOption(giftCardVM)
+        ? _buildCardOption(giftCardVM) // 2 grid layout
         : _sellCardInputs(giftCardVM);
   }
 
@@ -249,7 +247,7 @@ class _GiftCardScreenState extends State<GiftCardScreen> {
         const SizedBox(height: 16),
         Expanded(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 30.0),
+            padding: const EdgeInsets.symmetric(horizontal: 15.0),
             child: _build2GridCardList(viewModel),
           ),
         ),
@@ -368,7 +366,7 @@ class _GiftCardScreenState extends State<GiftCardScreen> {
           ),
           child: Row(
             children: [
-              Icon(Icons.warning_amber_rounded, color: Colors.orange.shade700),
+              Icon(Icons.info_outline, color: Colors.orange.shade700),
               const SizedBox(width: 8),
               Expanded(
                   child: CustomText(
@@ -950,9 +948,9 @@ class _GiftCardScreenState extends State<GiftCardScreen> {
       physics: const AlwaysScrollableScrollPhysics(),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        crossAxisSpacing: 2,
-        mainAxisSpacing: 20,
-        childAspectRatio: 2.2,
+        crossAxisSpacing: 15,
+        mainAxisSpacing: 25,
+        childAspectRatio: 1.5,
       ),
       itemCount: filtered.length,
       itemBuilder: (context, index) {
@@ -1156,14 +1154,17 @@ class _GiftCardScreenState extends State<GiftCardScreen> {
 
   void _showTradeSummary() {
     if (mounted) context.hideKeyboard(); // hide keyboard
-    if ((isAmong3Uploads() && uploadedImages.length < 3)) {
-      context.toastMsg("This card requires 3 images");
+    if ((isAmong3Uploads() && uploadedImages.length < 2)) {
+      context.toastMsg("This card requires at-least 2 images");
       return;
     }
+    /*
     if ((isAmong2Uploads() && uploadedImages.length < 2)) {
       context.toastMsg("This card requires 2 images");
       return;
     }
+     */
+
     final transaction = GiftCardTradeM(
       id: '', // not yet created — leave empty or temp
       assetName: selectedCardAsset!.name,

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart';
 import 'package:legit_cards/data/models/user_model.dart';
 import 'package:http/http.dart' as http;
@@ -195,7 +196,7 @@ class ProfileApi {
     );
     BankAccountsResponse model =
         BankAccountsResponse.fromJson(jsonDecode(response.body));
-    print("General log: the api model is $model");
+    // print("General log: the api model is $model");
     if (response.statusCode == 200 || response.statusCode == 201) {
       return model;
     } else {
@@ -217,21 +218,40 @@ class ProfileApi {
     return getApiResponse(response);
   }
 
+  //update user PIN
+  Future<ProfileResponseM> deleteAccount(
+      Map<String, dynamic> fieldMap, String token) async {
+    final url = Uri.parse("$baseUrl/api/auth/users/account/delete");
+    final response = await http.delete(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer $token",
+      },
+      body: jsonEncode(fieldMap),
+    );
+    return getApiResponse(response);
+  }
+
   // =========  reusable method to get api response
   ProfileResponseM getApiResponse(Response response) {
     try {
       // print("General log: raw data mode is ${response.body}");
       ProfileResponseM model =
           ProfileResponseM.fromJson(jsonDecode(response.body));
-      print("General log: the api model is $model");
+      if (kDebugMode) {
+        print("General log: the api model is $model");
+      }
       if (response.statusCode == 200 || response.statusCode == 201) {
         return model;
       } else {
         throw Exception(model.message);
       }
     } catch (e) {
-      print("General log: ❌ API Error: $e");
-      throw Exception("Failed to parse API response: $e");
+      if (kDebugMode) {
+        print("General log: ❌ API Error: $e");
+      }
+      throw Exception("$e");
     }
   }
 }

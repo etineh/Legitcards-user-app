@@ -5,9 +5,9 @@ import 'package:legit_cards/data/models/user_model.dart';
 import 'package:legit_cards/extension/inbuilt_ext.dart';
 import 'package:legit_cards/screens/profile/profile_view_model.dart';
 import 'package:provider/provider.dart';
-import '../../Utilities/cache_utils.dart';
-import '../widgets/app_bar.dart';
-import '../widgets/bank_details_wg.dart';
+import '../../../Utilities/cache_utils.dart';
+import '../../widgets/app_bar.dart';
+import '../../widgets/bank_details_wg.dart';
 
 class AllBankAccountsScreen extends StatelessWidget {
   final UserProfileM? userProfileM;

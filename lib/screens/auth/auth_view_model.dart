@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:legit_cards/constants/k.dart';
 import 'package:legit_cards/data/repository/app_repository.dart';
 import 'package:legit_cards/extension/inbuilt_ext.dart';
@@ -90,11 +92,22 @@ class AuthViewModel extends ChangeNotifier {
     if (signRes.statusCode == "AUTHENTICATED" && signRes.status == 200) {
       final userProfileM = signRes.data!.first.userInfo!;
       userProfileM.token = signRes.data?.first.token;
-      // print("General log: from login $userProfileM");
+
       // save userProfile data to local shareRef
-      // SecureStorageRepo.saveUserProfile(userProfileM);
-      // go to home screen
-      context.goNextScreenWithData(K.dashboardScreen, extra: userProfileM);
+      SecureStorageRepo.saveUserProfile(userProfileM);
+
+      // Sign in to Firebase anonymously
+      try {
+        await FirebaseAuth.instance.signInAnonymously();
+      } catch (e) {
+        if (kDebugMode) {
+          print('General log: Firebase auth error: $e');
+        }
+      }
+      // Navigate to dashboard
+      if (context.mounted) {
+        context.goNextScreenWithData(K.dashboardScreen, extra: userProfileM);
+      }
     } else if (signRes.statusCode == "LOGIN_CODE_SENT" && goScreen) {
       // user has 2fa login screen to enter 2fa code
       context.goNextScreenWithData(K.login2Fa, extra: signModel);

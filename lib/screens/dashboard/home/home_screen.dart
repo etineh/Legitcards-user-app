@@ -4,6 +4,7 @@ import 'package:legit_cards/Utilities/adjust_utils.dart';
 import 'package:legit_cards/constants/app_colors.dart';
 import 'package:legit_cards/extension/inbuilt_ext.dart';
 import 'package:legit_cards/screens/dashboard/coins/crypto_vm.dart';
+import 'package:legit_cards/screens/notification/notification_view_model.dart';
 import 'package:legit_cards/screens/wallet/wallet_view_model.dart';
 import 'package:legit_cards/screens/widgets/custom_text.dart';
 import 'package:provider/provider.dart';
@@ -12,6 +13,8 @@ import '../../../constants/k.dart';
 import '../../../data/models/gift_card_trades_m.dart';
 import '../../../data/models/user_model.dart';
 import '../../../data/repository/secure_storage_repo.dart';
+import '../../../services/firebase_messaging_service.dart';
+import '../../widgets/support_count_wg.dart';
 import '../gift_cards/gift_card_vm.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -35,6 +38,7 @@ class _HomeScreenState extends State<HomeScreen> {
   late final Function(int)? onTabChange;
   late final Function(GiftCardAssetM)? onCardSelected;
   bool _isBalanceVisible = true;
+  bool notificationIsUnread = false;
 
   @override
   void initState() {
@@ -44,15 +48,39 @@ class _HomeScreenState extends State<HomeScreen> {
     onCardSelected = widget.onCardSelected;
     fetchCryptoRates();
     fetchBalance();
+    refreshPushToken();
 
     super.initState();
   }
 
+  Future<void> refreshPushToken() async {
+    final messagingService = FirebaseMessagingService();
+    String? getPushToken = await messagingService.getDeviceToken();
+    if (getPushToken != null &&
+        mounted &&
+        (getPushToken != userProfileM?.pushToken)) {
+      final payload = {
+        "pushToken": getPushToken,
+        "email": userProfileM?.email,
+      };
+      final notificationVM =
+          Provider.of<NotificationViewModel>(context, listen: false);
+      notificationVM.saveDeviceToken(payload, userProfileM!.token!);
+    }
+  }
+
   void fetchBalance() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       final walletVM = Provider.of<WalletViewModel>(context, listen: false);
       if (userProfileM == null) return;
       walletVM.fetchBalance(userProfileM!, context: context);
+
+      // check if there is unread notification
+      final isUnread =
+          await SecureStorageRepo.notificationIsUnread(userProfileM!);
+      setState(() {
+        notificationIsUnread = isUnread;
+      });
     });
   }
 
@@ -66,8 +94,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // if (userProfileM == null) {return;}
-    WalletViewModel walletVM = Provider.of<WalletViewModel>(context);
+    // WalletViewModel walletVM = Provider.of<WalletViewModel>(context);
     return SingleChildScrollView(
       child: Container(
         margin: const EdgeInsets.all(15),
@@ -79,7 +106,7 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 20),
 
             /// Wallet Balance Card
-            _wallet(walletVM),
+            _wallet(),
             const SizedBox(height: 20),
 
             /// Card and Crypto Action Buttons
@@ -131,22 +158,57 @@ class _HomeScreenState extends State<HomeScreen> {
         // RIGHT SIDE: Notification + Support icons
         Row(
           children: [
+            // if (notificationIsUnread) // show the indicator icon
+            // Just wrap your icon with this
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                InkWell(
+                  onTap: () {
+                    context.goNextScreenWithData(K.notificationScreen,
+                        extra: userProfileM);
+                    setState(() {
+                      notificationIsUnread = false;
+                    });
+                  },
+                  borderRadius: BorderRadius.circular(20),
+                  child:
+                      Icon(Icons.notifications_none, color: context.purpleText),
+                ),
+                if (notificationIsUnread)
+                  Positioned(
+                    right: 0,
+                    top: 0,
+                    child: Container(
+                      width: 10,
+                      height: 10,
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 1),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(width: 20),
+            // UnreadBadge(
+            //   userId: userProfileM!.userid!,
+            //   child: IconButton(
+            //     icon: Icon(Icons.support_agent, color: context.purpleText),
+            //     onPressed: () => context.goNextScreenWithData(
+            //         K.liveSupportScreen,
+            //         extra: userProfileM),
+            //   ),
+            // ),
             // InkWell(
             //   onTap: () {
-            //     context.toastMsg("Notifications in progress");
+            //     context.toastMsg("Live Support coming soon");
             //   },
             //   borderRadius: BorderRadius.circular(20),
-            //   child: Icon(Icons.notifications_none, color: context.purpleText),
+            //   child: Icon(Icons.support_agent, color: context.purpleText),
             // ),
-            // const SizedBox(width: 20),
-            InkWell(
-              onTap: () {
-                context.toastMsg("Live Support coming soon");
-              },
-              borderRadius: BorderRadius.circular(20),
-              child: Icon(Icons.support_agent, color: context.purpleText),
-            ),
-            const SizedBox(width: 5),
+            // const SizedBox(width: 5),
           ],
         ),
       ],
@@ -230,7 +292,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _wallet(WalletViewModel walletVM) {
+  Widget _wallet() {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(15),
@@ -451,3 +513,4 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
+// 68d2ce7b40075d28ac01e297h2d5slvd

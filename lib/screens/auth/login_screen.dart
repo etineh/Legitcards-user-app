@@ -7,7 +7,9 @@ import 'package:legit_cards/screens/widgets/InputField.dart';
 import 'package:legit_cards/screens/widgets/LogoWidget.dart';
 import 'package:legit_cards/screens/widgets/PasswordField.dart';
 import 'package:legit_cards/screens/widgets/PrimaryButton.dart';
+import 'package:legit_cards/screens/widgets/custom_text.dart';
 import 'package:provider/provider.dart';
+import '../../Utilities/cache_utils.dart';
 import '../../Utilities/device_utils.dart';
 import '../../data/models/user_model.dart';
 import '../../data/repository/secure_storage_repo.dart';
@@ -29,13 +31,29 @@ class _SigninScreenState extends State<LoginScreen> {
 
   // bool _termsAccepted = false;
   final ValidationService _validationService = ValidationService();
-  // String? _gender; // Add gender state
+  UserProfileM? userProfileM; // Add gender state
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    getUser();
+    super.initState();
+  }
+
+  Future<void> getUser() async {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final user = await SecureStorageRepo.getUserProfile();
+      _emailController.text = user?.email ?? "";
+      setState(() {
+        userProfileM = user;
+      });
+    });
   }
 
   Future<void> _signin(AuthViewModel authViewModel) async {
@@ -96,7 +114,7 @@ class _SigninScreenState extends State<LoginScreen> {
                           style: TextStyle(
                             fontSize: 32,
                             fontWeight: FontWeight.bold,
-                            color: context.purpleText,
+                            color: context.blackWhite,
                           ),
                         ),
                       ],
@@ -106,16 +124,23 @@ class _SigninScreenState extends State<LoginScreen> {
                   const SizedBox(height: 50),
 
                   // Email Field
-                  InputField(
-                    fillColor: context.cardColor,
-                    controller: _emailController,
-                    labelText: 'Email address',
-                    hintText: 'your@email.com',
-                    prefixIcon: Icons.email_outlined,
-                    keyboardType: TextInputType.emailAddress,
-                    textInputAction: TextInputAction.next,
-                    validator: _validationService.validateEmail,
-                  ),
+                  userProfileM == null
+                      ? InputField(
+                          fillColor: context.cardColor,
+                          controller: _emailController,
+                          labelText: 'Email address',
+                          hintText: 'your@email.com',
+                          prefixIcon: Icons.email_outlined,
+                          keyboardType: TextInputType.emailAddress,
+                          textInputAction: TextInputAction.next,
+                          validator: _validationService.validateEmail,
+                        )
+                      : Center(
+                          child: CustomText(
+                            text: "Welcome ${userProfileM?.firstname}!",
+                            size: 20,
+                          ),
+                        ),
 
                   const SizedBox(height: 20),
 
@@ -160,7 +185,22 @@ class _SigninScreenState extends State<LoginScreen> {
                   const SizedBox(height: 20),
 
                   // Signin Link
-                  signinLink(context),
+                  userProfileM == null
+                      ? signinLink(context)
+                      : Center(
+                          child: CustomText(
+                            size: 18,
+                            text: "Logout",
+                            color: Colors.orange,
+                            onTap: () {
+                              setState(() {
+                                userProfileM = null;
+                              });
+                              CacheUtils.logout(context);
+                              _emailController.text = "";
+                            },
+                          ),
+                        ),
                 ],
               ),
             ),

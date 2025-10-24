@@ -60,13 +60,25 @@ extension ContextExtensions on BuildContext {
 
   void toastMsg(String message,
       {Color color = Colors.orange, int timeInSec = 4}) {
+    String cleanedMessage = message;
+
+    // Remove ALL occurrences, not just at the start
+    cleanedMessage = cleanedMessage.replaceAll('Exception: ', '');
+    // cleanedMessage = cleanedMessage.replaceAll('Error: ', '');
+    cleanedMessage = cleanedMessage.replaceAll('exception: ', '');
+    // cleanedMessage = cleanedMessage.replaceAll('error: ', '');
+
+    // Trim any extra spaces
+    cleanedMessage = cleanedMessage.trim();
+
     ScaffoldMessenger.of(this)
       ..removeCurrentSnackBar()
       ..showSnackBar(
         SnackBar(
-          content: Text(message),
+          content: Text(cleanedMessage),
           backgroundColor: color,
           duration: Duration(seconds: timeInSec),
+          behavior: SnackBarBehavior.floating,
         ),
       );
   }

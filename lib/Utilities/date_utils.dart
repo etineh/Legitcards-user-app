@@ -126,4 +126,54 @@ class DateAndTimeUtils {
         return 'th';
     }
   }
+
+  // e.g 2 days ago
+  static String getTimeAgoFromString(String dateTimeString) {
+    try {
+      final dateTime = DateTime.parse(dateTimeString);
+      final now = DateTime.now();
+      final difference = now.difference(dateTime);
+
+      if (difference.inDays > 7) {
+        // Show formatted date for older than 7 days
+        return DateAndTimeUtils.formatToDateAndTime(dateTimeString);
+      } else if (difference.inDays > 0) {
+        return '${difference.inDays}d ago';
+      } else if (difference.inHours > 0) {
+        return '${difference.inHours}h ago';
+      } else if (difference.inMinutes > 0) {
+        return '${difference.inMinutes}m ago';
+      } else {
+        return 'Just now';
+      }
+    } catch (e) {
+      // Fallback if parsing fails
+      return dateTimeString;
+    }
+  }
+
+  static String getTimeAgoFromMillis(int millis) {
+    try {
+      final dateTime = DateTime.fromMillisecondsSinceEpoch(millis);
+      final now = DateTime.now();
+      final difference = now.difference(dateTime);
+
+      if (difference.inDays > 7) {
+        // Show formatted date for older than 7 days
+        return DateAndTimeUtils.formatToDateAndTime(
+          dateTime.toIso8601String(),
+        );
+      } else if (difference.inDays > 0) {
+        return '${difference.inDays}d ago';
+      } else if (difference.inHours > 0) {
+        return '${difference.inHours}h ago';
+      } else if (difference.inMinutes > 0) {
+        return '${difference.inMinutes}m ago';
+      } else {
+        return 'Just now';
+      }
+    } catch (e) {
+      return 'Invalid date';
+    }
+  }
 }

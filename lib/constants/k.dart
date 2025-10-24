@@ -10,7 +10,6 @@ class K {
   static const loginPath = "/login";
   static const otpPath = "/otp-screen";
   static const profilePath = "/profile";
-  static const notificationPath = "/notification";
   static const editProfile = "/edit-profile";
   static const resetPassword = "/reset-password";
   static const changePassword = "/change-password";
@@ -22,8 +21,12 @@ class K {
   static const viewBankAccount = "/view-bank-account";
   static const withdrawScreen = "/withdraw";
   static const withdrawReceiptScreen = "/withdraw-receipt";
-  static const directSupportScreen = "/directSupport";
+  static const directSupportScreen = "/direct-support";
   static const advanceScreen = "/advance";
+  static const liveSupportScreen = "/live-support";
+  static const notificationScreen = "/notification";
+  static const String notificationDetailScreen = '/notification-detail';
+  // static const advanceScreen = "/advance";
 
   static const submitNow = "Submit Now";
   static const cancelTransaction = "Cancel Transaction";
@@ -48,7 +51,8 @@ class K {
   static const CARD = "CARD";
   static const COIN = "CRYPTO";
 
-  static const VERSION = "1.23";
+  static const VERSION_NAME = "1.23.0";
+  static const VERSION_CODE = "16012";
 
   static bool isAndroid() {
     return Platform.isAndroid;

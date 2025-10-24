@@ -192,21 +192,20 @@ class _ProfileScreenState extends State<ProfileScreen> with RouteAware {
 
               // Support Section
               _text("Support"),
-              // const SizedBox(height: 10),
-              //
-              // // Tickets
-              // ActionCard(
-              //   text: "Tickets",
-              //   onTap: () {
-              //     context.toastMsg("2Fa");
-              //   },
-              // ),
-
               const SizedBox(height: 10),
+
+              // Tickets
+              // ActionCard(
+              //   text: "Live Chat",
+              //   onTap: () => context.goNextScreenWithData(K.liveSupportScreen,
+              //       extra: user),
+              // ),
+              //
+              // const SizedBox(height: 10),
 
               // Direct Support
               ActionCard(
-                text: "Direct Support",
+                text: "Direct Contact",
                 onTap: () => context.goNextScreen(K.directSupportScreen),
               ),
 
@@ -235,7 +234,7 @@ class _ProfileScreenState extends State<ProfileScreen> with RouteAware {
               // Version
               Center(
                 child: Text(
-                  'Version 1.23.0 (16011)',
+                  'Version ${K.VERSION_NAME} (${K.VERSION_CODE})',
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.grey[500],

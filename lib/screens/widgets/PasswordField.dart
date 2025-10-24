@@ -86,8 +86,7 @@ class _PasswordFieldState extends State<PasswordField> {
           labelText: widget.labelText,
           hintText: widget.hintText,
           labelStyle: TextStyle(
-            color: Colors.grey[600],
-            fontWeight: FontWeight.w500,
+            color: context.defaultColor.withOpacity(0.3),
           ),
           hintStyle: TextStyle(color: Colors.grey[400]),
           prefixIcon: widget.prefixIcon != null

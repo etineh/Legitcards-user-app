@@ -102,7 +102,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
           _handleBackPress(didPop);
         },
         child: Scaffold(
-          backgroundColor: context.backgroundColor,
+          backgroundColor: context
+              .backgroundColor, //Colors.black, // context.backgroundColor,
           bottomNavigationBar: BottomNavigationBar(
             currentIndex: currentIndex,
             selectedItemColor: AppColors.lightPurple,

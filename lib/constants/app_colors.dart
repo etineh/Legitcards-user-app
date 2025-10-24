@@ -36,6 +36,7 @@ class AppColors {
 
   // Dark mode colors
   static const Color appDark = Color(0xFF18121C); // Background
+  static const Color pureBlack = Color(0xFF000000);
   static const Color cardDark = Color(0xFF141B2A);
   // static const Color iconBgDark = Color(0xFF141B2A);
   static const Color textDark = Color(0xFFF5F5F5);

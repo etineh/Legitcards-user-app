@@ -76,22 +76,16 @@ class UserProfileM {
   bool? profileUpdate;
   String? token;
   final int? loginTrial;
-  final String? pin;
-  final int pinTrial;
-  final int? pinBlockDate;
-  final bool pinBlocked;
   final String dob;
   final String? country;
   final String? ipAddress;
   final String? bvn;
   final String? profilePic;
-  // final OtpModel? otp;
   final String? usertype;
   final String? regId;
   final String? gender;
   bool? is2fa;
   final String? twofaType;
-  // final ResetPasswordModel? resetPassword;
   final DateTime? createdAt;
   final bool? accountVerify;
 
@@ -109,10 +103,6 @@ class UserProfileM {
     this.profileUpdate = false,
     this.token,
     this.loginTrial = 0,
-    this.pin = "0",
-    this.pinTrial = 0,
-    this.pinBlockDate,
-    this.pinBlocked = false,
     this.dob = "DD/MM/YYYY",
     this.country,
     this.ipAddress,
@@ -145,10 +135,6 @@ class UserProfileM {
       profileUpdate: json['profile_update'] ?? false,
       token: json['token'],
       loginTrial: json['logintrial'] ?? 0,
-      pin: json['pin'] ?? "0",
-      pinTrial: json['pin_trial'] ?? 0,
-      pinBlockDate: json['pin_block_date'],
-      pinBlocked: json['pin_blocked'] ?? false,
       dob: json['dob'] ?? "DD/MM/YYYY",
       country: json['country'],
       ipAddress: json['ip_address'],
@@ -186,10 +172,6 @@ class UserProfileM {
       'profile_update': profileUpdate,
       'token': token,
       'logintrial': loginTrial,
-      'pin': pin,
-      'pin_trial': pinTrial,
-      'pin_block_date': pinBlockDate,
-      'pin_blocked': pinBlocked,
       'dob': dob,
       'country': country,
       'ip_address': ipAddress,
@@ -224,10 +206,6 @@ class UserProfileM {
         'profileUpdate: $profileUpdate, '
         'token: $token, '
         'loginTrial: $loginTrial, '
-        'pin: $pin, '
-        'pinTrial: $pinTrial, '
-        'pinBlockDate: $pinBlockDate, '
-        'pinBlocked: $pinBlocked, '
         'dob: $dob, '
         'country: $country, '
         'ipAddress: $ipAddress, '

@@ -463,12 +463,12 @@ class _CoinScreenState extends State<CoinScreen> {
       ),
       child: Row(
         children: [
-          Icon(Icons.warning_amber_rounded, color: Colors.orange.shade700),
+          // Icon(Icons.warning_amber_rounded, color: Colors.orange.shade700),
           const SizedBox(width: 8),
-          const Expanded(
+          Expanded(
               child: CustomText(
             text:
-                "Sending to wrong address or an address on another network may result in lost coins.",
+                "1. Send your $selectedCoin to the wallet address provided here. \n2. After sending, upload your transaction proof and click on proceed to submit your trade. \n3. Sending to wrong address or an address on another network may result in lost coins.",
             size: 12,
             color: Colors.black,
           )),
@@ -943,9 +943,3 @@ class _CoinScreenState extends State<CoinScreen> {
     });
   }
 }
-
-/*
-1. Send your BTC to the wallet address provided here.
-2. After sending, upload your transaction proof and click on proceed to submit your trade.
-3.  Will be the current note
- */

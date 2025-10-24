@@ -125,4 +125,52 @@ class AdjustUtils {
         return Colors.grey;
     }
   }
+
+  static IconData getIconForTitle(String title) {
+    final lowerTitle = title.toLowerCase();
+    if (lowerTitle.contains('withdrawal')) return Icons.account_balance_wallet;
+    if (lowerTitle.contains('trade') && lowerTitle.contains('completed')) {
+      return Icons.check_circle;
+    }
+    if (lowerTitle.contains('trade') && lowerTitle.contains('declined')) {
+      return Icons.cancel;
+    }
+    if (lowerTitle.contains('reward') || lowerTitle.contains('bonus')) {
+      return Icons.card_giftcard;
+    }
+    if (lowerTitle.contains('weekend') || lowerTitle.contains('vibes')) {
+      return Icons.celebration;
+    }
+    return Icons.notifications;
+  }
+
+  static Color getColorForTitle(String title) {
+    final lowerTitle = title.toLowerCase();
+    if (lowerTitle.contains('withdrawal')) return Colors.blue;
+    if (lowerTitle.contains('completed')) return Colors.green;
+    if (lowerTitle.contains('declined')) return Colors.red;
+    if (lowerTitle.contains('reward') || lowerTitle.contains('bonus')) {
+      return Colors.orange;
+    }
+    if (lowerTitle.contains('weekend')) return Colors.purple;
+    return AppColors.lightPurple;
+  }
+
+  // Extract MongoDB ObjectId (24 character hex string) from userid
+  static String extractObjectId(String userid) {
+    // MongoDB ObjectId is always 24 hex characters
+    final regex = RegExp(r'^[a-f0-9]{24}');
+    final match = regex.firstMatch(userid.toLowerCase());
+
+    if (match != null) {
+      return match.group(0)!;
+    }
+
+    // Fallback: take first 24 characters if it looks like an ObjectId
+    if (userid.length >= 24) {
+      return userid.substring(0, 24);
+    }
+
+    return userid; // Return as-is if can't extract
+  }
 }

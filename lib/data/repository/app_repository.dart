@@ -1,6 +1,7 @@
 import 'package:legit_cards/data/models/user_model.dart';
 import 'package:legit_cards/data/models/wallet_model.dart';
 import 'package:legit_cards/data/repository/secure_storage_repo.dart';
+import 'package:legit_cards/services/api/notification_api.dart';
 import 'package:legit_cards/services/api/profile_api.dart';
 import 'package:legit_cards/services/api/wallet_api.dart';
 
@@ -13,6 +14,7 @@ import '../models/auth_model.dart';
 import '../models/crypto_trade_m.dart';
 import '../models/gift_card_trades_m.dart';
 import '../models/history_model.dart';
+import '../models/notification_model.dart';
 import '../models/user_bank_model.dart';
 
 class AppRepository {
@@ -21,6 +23,7 @@ class AppRepository {
   final GiftCardApi _giftCardApi = GiftCardApi();
   final CryptoApi _cryptoApi = CryptoApi();
   final WalletApi _walletApi = WalletApi();
+  final NotificationApi _notificationApi = NotificationApi();
 
   Future<ApiResponseM> signup(SignModel user) async {
     try {
@@ -240,6 +243,16 @@ class AppRepository {
     }
   }
 
+  Future<ProfileResponseM> deleteAccount(
+      Map<String, dynamic> payload, String token) async {
+    try {
+      return await _profileApi.deleteAccount(payload, token);
+    } catch (e) {
+      return checkError(e,
+          createError: (String message) => ProfileResponseM.error(message));
+    }
+  }
+
   //  ==============  Gift Card Trade
 
   Future<GiftCardResponseM> fetchCardAsset(String token) async {
@@ -354,6 +367,38 @@ class AppRepository {
           createError: (String message) => WithdrawRecordResM.error(message));
     }
   }
+
+  //  ==============  Notification
+
+  Future<NotificationResponseM> getNotifications(
+    String userid,
+    String token, {
+    int page = 0,
+  }) async {
+    try {
+      return await _notificationApi.getNotifications(userid, token, page: page);
+    } catch (e) {
+      throw Exception('Failed to fetch notifications: $e');
+    }
+  }
+
+  Future<ProfileResponseM> savePushToken(
+      Map<String, dynamic> payload, String token) async {
+    try {
+      return await _notificationApi.saveDeviceToken(payload, token);
+    } catch (e) {
+      throw Exception('Failed to fetch notifications: $e');
+    }
+  }
+
+  // Future<ProfileResponseM> saveNotificationToBackend(
+  //     Map<String, dynamic> payload, String token) async {
+  //   try {
+  //     return await _notificationApi.saveNotificationToBackend(payload, token);
+  //   } catch (e) {
+  //     throw Exception('Failed to fetch notifications: $e');
+  //   }
+  // }
 
 // reusable method
   Future<T> checkError<T>(

@@ -120,9 +120,9 @@ class _HistoryScreenState extends State<HistoryScreen>
 
   Widget _buildTabBar() {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
+      margin: const EdgeInsets.symmetric(horizontal: 10),
       decoration: BoxDecoration(
-        color: AppColors.primaryPurple,
+        color: AppColors.lightPurple,
         borderRadius: BorderRadius.circular(25),
       ),
       child: TabBar(

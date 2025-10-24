@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:legit_cards/Utilities/cache_utils.dart';
 import 'package:legit_cards/data/models/user_model.dart';
+import 'package:legit_cards/extension/inbuilt_ext.dart';
 import '../../data/models/user_bank_model.dart';
 import '../../data/repository/app_repository.dart';
 
@@ -99,6 +100,19 @@ class ProfileViewModel extends ChangeNotifier {
   Future<ProfileResponseM> deleteBankAccount(
       Map<String, dynamic> payload, String token) async {
     return getResponse(_repository.deleteBankAccount(payload, token));
+  }
+
+  Future<void> deleteAccount(
+      Map<String, dynamic> payload, String token, BuildContext context) async {
+    final res = await getResponse(_repository.deleteAccount(payload, token));
+    if (!context.mounted) return;
+
+    print(res.message);
+    context.toastMsg(res.message);
+
+    if (res.statusCode == "ACCOUNT_DELETED") {
+      CacheUtils.logout(context);
+    }
   }
 
   // reusable function

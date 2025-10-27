@@ -23,7 +23,7 @@ class K {
   static const withdrawReceiptScreen = "/withdraw-receipt";
   static const directSupportScreen = "/direct-support";
   static const advanceScreen = "/advance";
-  static const liveSupportScreen = "/live-support";
+  static const supportChatsScreen = "/support-chats";
   static const notificationScreen = "/notification";
   static const String notificationDetailScreen = '/notification-detail';
   // static const advanceScreen = "/advance";

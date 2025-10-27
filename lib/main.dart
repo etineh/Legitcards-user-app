@@ -28,6 +28,7 @@ import 'package:legit_cards/screens/profile/enable_2fa_screen.dart';
 import 'package:legit_cards/screens/profile/profile_screen.dart';
 import 'package:legit_cards/screens/profile/profile_view_model.dart';
 import 'package:legit_cards/screens/profile/support/live_support_screen.dart';
+import 'package:legit_cards/screens/profile/support/support_chatList_screen.dart';
 import 'package:legit_cards/screens/profile/update_pin_screen.dart';
 import 'package:legit_cards/screens/wallet/wallet_view_model.dart';
 import 'package:legit_cards/screens/wallet/withdrawal_receipt_screen.dart';
@@ -299,11 +300,11 @@ class _MyAppState extends State<MyApp> {
           },
         ),
         GoRoute(
-          name: K.liveSupportScreen,
-          path: K.liveSupportScreen,
+          name: K.supportChatsScreen,
+          path: K.supportChatsScreen,
           builder: (context, state) {
             final userData = state.extra as UserProfileM;
-            return LiveSupportScreen(userProfile: userData);
+            return SupportChatListScreen(userProfile: userData);
           },
         ),
       ],

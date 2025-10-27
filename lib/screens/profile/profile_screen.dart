@@ -195,13 +195,13 @@ class _ProfileScreenState extends State<ProfileScreen> with RouteAware {
               const SizedBox(height: 10),
 
               // Tickets
-              // ActionCard(
-              //   text: "Live Chat",
-              //   onTap: () => context.goNextScreenWithData(K.liveSupportScreen,
-              //       extra: user),
-              // ),
-              //
-              // const SizedBox(height: 10),
+              ActionCard(
+                text: "Live Chat",
+                onTap: () => context.goNextScreenWithData(K.supportChatsScreen,
+                    extra: user),
+              ),
+
+              const SizedBox(height: 10),
 
               // Direct Support
               ActionCard(

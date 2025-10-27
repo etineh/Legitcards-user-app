@@ -8,10 +8,14 @@ import '../../../services/live_support_service.dart';
 
 class LiveSupportScreen extends StatefulWidget {
   final UserProfileM userProfile;
+  final String chatId;
+  final bool isClosed;
 
   const LiveSupportScreen({
     super.key,
     required this.userProfile,
+    required this.chatId,
+    this.isClosed = false,
   });
 
   @override
@@ -22,12 +26,18 @@ class _LiveSupportScreenState extends State<LiveSupportScreen> {
   final LiveSupportService _supportService = LiveSupportService();
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  late bool _isChatClosed;
 
   @override
   void initState() {
     super.initState();
+    _isChatClosed = widget.isClosed;
     // Mark messages as read when opening chat
-    _supportService.markMessagesAsRead(widget.userProfile.userid!, false);
+    _supportService.markMessagesAsRead(
+      widget.userProfile.userid!,
+      widget.chatId,
+      false,
+    );
   }
 
   @override
@@ -38,6 +48,11 @@ class _LiveSupportScreenState extends State<LiveSupportScreen> {
   }
 
   void _sendMessage() async {
+    if (_isChatClosed) {
+      context.toastMsg('This chat is closed. Start a new chat to continue.');
+      return;
+    }
+
     final message = _messageController.text.trim();
     if (message.isEmpty) return;
 
@@ -46,9 +61,9 @@ class _LiveSupportScreenState extends State<LiveSupportScreen> {
     try {
       await _supportService.sendMessage(
         userId: widget.userProfile.userid!,
+        chatId: widget.chatId,
         userName:
             '${widget.userProfile.firstname} ${widget.userProfile.lastname}',
-        userEmail: widget.userProfile.email!,
         message: message,
         isAdmin: false,
       );
@@ -77,11 +92,42 @@ class _LiveSupportScreenState extends State<LiveSupportScreen> {
       appBar: _appBar(),
       body: Column(
         children: [
+          // Closed chat banner
+          if (_isChatClosed)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.orange.shade100,
+                border: Border(
+                  bottom: BorderSide(color: Colors.orange.shade300),
+                ),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.info_outline,
+                      color: Colors.orange.shade800, size: 20),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'This chat is closed. You can view messages but cannot reply.',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.orange.shade900,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
           // Messages List
           Expanded(
             child: StreamBuilder<List<SupportMessageM>>(
-              stream:
-                  _supportService.listenToMessages(widget.userProfile.userid!),
+              stream: _supportService.listenToMessages(
+                widget.userProfile.userid!,
+                widget.chatId,
+              ),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
@@ -153,77 +199,79 @@ class _LiveSupportScreenState extends State<LiveSupportScreen> {
             ),
           ),
 
-          // Message Input
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: context.cardColor,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 5,
-                  offset: const Offset(0, -2),
-                ),
-              ],
-            ),
-            child: SafeArea(
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      style: TextStyle(
-                        color: context.blackWhite,
-                      ),
-                      controller: _messageController,
-                      decoration: InputDecoration(
-                        hintText: 'Type your message...',
-                        hintStyle: TextStyle(
-                          color: Colors.grey[500], // customizable hint color
-                        ),
-                        // fillColor: context.backgroundGray,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30),
-                          borderSide: const BorderSide(
-                            color: AppColors.lighterPurple,
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30),
-                          borderSide: const BorderSide(
-                            color: AppColors.lightPurple,
-                            width: 2,
-                          ),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30),
-                          borderSide: BorderSide(
-                            color: context.backgroundGray,
-                          ),
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 12,
-                        ),
-                      ),
-                      maxLines: null,
-                      textCapitalization: TextCapitalization.sentences,
-                      onSubmitted: (_) => _sendMessage(),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  CircleAvatar(
-                    backgroundColor: AppColors.lightPurple,
-                    child: IconButton(
-                      icon:
-                          const Icon(Icons.send, color: Colors.white, size: 20),
-                      onPressed: _sendMessage,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+          // Message Input (only show if chat is not closed)
+          if (!_isChatClosed) _buildMessageInput(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMessageInput() {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: context.cardColor,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 5,
+            offset: const Offset(0, -2),
           ),
         ],
+      ),
+      child: SafeArea(
+        child: Row(
+          children: [
+            Expanded(
+              child: TextField(
+                style: TextStyle(
+                  color: context.blackWhite,
+                ),
+                controller: _messageController,
+                decoration: InputDecoration(
+                  hintText: 'Type your message...',
+                  hintStyle: TextStyle(
+                    color: Colors.grey[500],
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
+                    borderSide: const BorderSide(
+                      color: AppColors.lighterPurple,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
+                    borderSide: const BorderSide(
+                      color: AppColors.lightPurple,
+                      width: 2,
+                    ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
+                    borderSide: BorderSide(
+                      color: context.backgroundGray,
+                    ),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 12,
+                  ),
+                ),
+                maxLines: null,
+                textCapitalization: TextCapitalization.sentences,
+                onSubmitted: (_) => _sendMessage(),
+              ),
+            ),
+            const SizedBox(width: 8),
+            CircleAvatar(
+              backgroundColor: AppColors.lightPurple,
+              child: IconButton(
+                icon: const Icon(Icons.send, color: Colors.white, size: 20),
+                onPressed: _sendMessage,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -238,29 +286,59 @@ class _LiveSupportScreenState extends State<LiveSupportScreen> {
             child: const Icon(Icons.person, color: Colors.purple),
           ),
           const SizedBox(width: 10),
-          const Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Live Support',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-              ),
-              Text(
-                'We typically reply in few minutes',
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.normal),
-              ),
-            ],
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Text(
+                      'Live Support',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                    ),
+                    if (_isChatClosed) ...[
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.3),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Text(
+                          'CLOSED',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+                Text(
+                  _isChatClosed
+                      ? 'Chat is closed'
+                      : 'We typically reply in few minutes',
+                  style: const TextStyle(
+                      fontSize: 12, fontWeight: FontWeight.normal),
+                ),
+              ],
+            ),
           ),
         ],
       ),
-      backgroundColor: Colors.transparent, // Make background transparent
+      backgroundColor: Colors.transparent,
       elevation: 0,
       flexibleSpace: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              Color(0xFFBF2882), // light purple
-              Color(0xFF5B2C98), // deep indigo
+              Color(0xFFBF2882),
+              Color(0xFF5B2C98),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,

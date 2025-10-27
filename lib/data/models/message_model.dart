@@ -1,4 +1,3 @@
-// Message Model
 class SupportMessageM {
   final String? messageId;
   final String? senderId;
@@ -67,8 +66,10 @@ class SupportChatM {
   final int? unreadCount;
   final String? status; // open, closed, pending
   final List<SupportMessageM>? messages;
+  // final bool isClosed;
+  final String? chatId;
 
-  SupportChatM({
+  const SupportChatM({
     this.userId,
     this.userName,
     this.userEmail,
@@ -77,6 +78,8 @@ class SupportChatM {
     this.unreadCount,
     this.status,
     this.messages,
+    // this.isClosed = true,
+    this.chatId,
   });
 
   factory SupportChatM.fromJson(Map<dynamic, dynamic> json) {
@@ -99,6 +102,8 @@ class SupportChatM {
       unreadCount: json['unreadCount'] as int? ?? 0,
       status: json['status'] as String? ?? 'open',
       messages: messagesList,
+      // isClosed: json['isClosed'] as bool? ?? true,
+      chatId: json['chatId'] as String?,
     );
   }
 
@@ -111,6 +116,8 @@ class SupportChatM {
       'lastMessageTime': lastMessageTime,
       'unreadCount': unreadCount,
       'status': status,
+      // 'isClosed': isClosed,
+      'chatId': chatId,
     };
   }
 }

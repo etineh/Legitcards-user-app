@@ -25,7 +25,17 @@ class LogoWidget extends StatelessWidget {
       margin: margin,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: backgroundColor ?? AppColors.primaryPurple,
+        color: backgroundColor != null
+            ? (backgroundColor ?? AppColors.primaryPurple)
+            : null, // Only use color if gradient is not provided
+        gradient: const LinearGradient(
+          colors: [
+            Color(0xFFBF2882), // light purple
+            Color(0xFF5B2C98), // deep indigo
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
@@ -38,11 +48,10 @@ class LogoWidget extends StatelessWidget {
         child: imagePath != null
             ? Image.asset(
                 imagePath!,
-                width: size * 0.75, // 75% of container size
+                width: size * 0.75,
                 height: size * 0.75,
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) {
-                  // Fallback icon if image fails
                   return Container(
                     decoration: const BoxDecoration(
                       color: Colors.white,
@@ -50,7 +59,7 @@ class LogoWidget extends StatelessWidget {
                     ),
                     child: Icon(
                       Icons.card_giftcard,
-                      size: size * 0.4, // 40% of container size
+                      size: size * 0.4,
                       color: iconColor ?? const Color(0xFF8B5CF6),
                     ),
                   );

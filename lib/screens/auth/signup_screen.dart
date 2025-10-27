@@ -127,10 +127,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   Center(
                     child: Column(
                       children: [
-                        const LogoWidget(
-                          size: 100.0,
-                          backgroundColor: AppColors.lightPurple,
-                        ),
+                        const LogoWidget(size: 100.0),
                         const SizedBox(height: 10),
                         Text(
                           'LegitCards',

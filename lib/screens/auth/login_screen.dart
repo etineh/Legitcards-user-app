@@ -104,10 +104,7 @@ class _SigninScreenState extends State<LoginScreen> {
                   Center(
                     child: Column(
                       children: [
-                        const LogoWidget(
-                          size: 100.0,
-                          backgroundColor: AppColors.lightPurple,
-                        ),
+                        const LogoWidget(size: 100.0),
                         const SizedBox(height: 10),
                         Text(
                           'LegitCards',

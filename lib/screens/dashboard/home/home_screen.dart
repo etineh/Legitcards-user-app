@@ -197,7 +197,7 @@ class _HomeScreenState extends State<HomeScreen> {
             //   child: IconButton(
             //     icon: Icon(Icons.support_agent, color: context.purpleText),
             //     onPressed: () => context.goNextScreenWithData(
-            //         K.liveSupportScreen,
+            //         K.supportChatsScreen,
             //         extra: userProfileM),
             //   ),
             // ),

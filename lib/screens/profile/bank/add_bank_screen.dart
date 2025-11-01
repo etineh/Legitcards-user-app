@@ -63,7 +63,10 @@ class _AddBankAccountScreenState extends State<AddBankAccountScreen> {
               _showBankList = false;
             });
           } else {
-            Navigator.pop(context);
+            final profileVM =
+                Provider.of<ProfileViewModel>(context, listen: false);
+            profileVM.setIsLoadingToFalse(); // stop the loader circle
+            context.goBack(); // com.legitcardsusers.legitCards
           }
         },
       ),
@@ -72,7 +75,7 @@ class _AddBankAccountScreenState extends State<AddBankAccountScreen> {
           gradient: LinearGradient(
             colors: [
               Color(0xFFBF2882), // light purple
-              Color(0xFF5B2C98), // deep indigo // deep indigo
+              Color(0xFF5B2C98), // deep indigo
             ],
             begin: Alignment.topLeft,
             // end: Alignment.bottomRight,

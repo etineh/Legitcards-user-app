@@ -140,29 +140,29 @@ class _CoinScreenState extends State<CoinScreen> {
   final ImagePicker _picker = ImagePicker();
 
   Future<void> _pickImage(ImageSource source) async {
-    // Request permission based on source
-    final permission =
-        source == ImageSource.gallery ? Permission.photos : Permission.camera;
+    try {
+      if (source == ImageSource.camera) {
+        // Camera still needs permission
+        final status = await Permission.camera.request();
+        if (!status.isGranted) {
+          if (mounted) {
+            context.toastMsg("Camera permission denied");
+          }
+          return;
+        }
+      }
 
-    final status = await permission.request();
-
-    if (status.isGranted) {
       final pickedFile = await _picker.pickImage(source: source);
       if (pickedFile != null && mounted) {
         File file = await AdjustUtils.optimizeImage(File(pickedFile.path));
-        // Upload to Cloudinary
-        // final uploadedUrl = await CloudinaryUtils.uploadImage(file);
         setState(() {
           uploadedImages.add(file);
         });
       }
-    } else if (mounted) {
-      // Handle denied permission
-      context.toastMsg(
-        source == ImageSource.gallery
-            ? "Gallery permission denied"
-            : "Camera permission denied",
-      );
+    } catch (e) {
+      if (mounted) {
+        context.toastMsg("Error picking image: $e");
+      }
     }
   }
 

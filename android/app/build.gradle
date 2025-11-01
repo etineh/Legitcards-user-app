@@ -24,10 +24,10 @@ android {
 
     defaultConfig {
         applicationId = "com.legitcardsusers"
-        minSdk = 21
+        minSdk = 23
         targetSdk = 35
-        versionCode = 16014
-        versionName = "1.25.0"
+        versionCode = 16015
+        versionName = "1.26.0"
 
         // Required for new page size support
         ndk {

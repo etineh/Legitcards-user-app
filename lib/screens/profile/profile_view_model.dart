@@ -90,11 +90,6 @@ class ProfileViewModel extends ChangeNotifier {
       CacheUtils.myBankAccount = response.data!;
       notifyListeners();
     }
-    // else if ((response.statusCode == "AUTHENTICATION_FAILED" ||
-    //         response.statusCode == "Failed") &&
-    //     context!.mounted) {
-    //   CacheUtils.logout(context);
-    // }
   }
 
   Future<ProfileResponseM> deleteBankAccount(
@@ -107,7 +102,7 @@ class ProfileViewModel extends ChangeNotifier {
     final res = await getResponse(_repository.deleteAccount(payload, token));
     if (!context.mounted) return;
 
-    print(res.message);
+    // print(res.message);
     context.toastMsg(res.message);
 
     if (res.statusCode == "ACCOUNT_DELETED") {
@@ -132,5 +127,10 @@ class ProfileViewModel extends ChangeNotifier {
         notifyListeners();
       }
     }
+  }
+
+  void setIsLoadingToFalse() {
+    _isLoading = false;
+    notifyListeners();
   }
 }

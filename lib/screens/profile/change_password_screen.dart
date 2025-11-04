@@ -73,13 +73,22 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       backgroundColor: context.backgroundColor,
       appBar: const CustomAppBar(title: "Change Password"),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () => context.hideKeyboard(),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(20),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: MediaQuery.of(context).size.height -
+                    MediaQuery.of(context).padding.top -
+                    kToolbarHeight - 40, // 40 is the padding (20 top + 20 bottom)
+              ),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
                 const SizedBox(height: 30),
 
                 // Current Password Field
@@ -124,6 +133,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
             ),
           ),
         ),
+        ),
+      ),
       ),
     );
   }

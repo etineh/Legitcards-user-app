@@ -207,55 +207,59 @@ class _CoinScreenState extends State<CoinScreen> {
       backgroundColor: context.backgroundColor,
       body: ModalProgressHUD(
         inAsyncCall: cryptoVM.isLoading,
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              // Coin Selector
-              _buildCoinSelector(cryptoVM),
-              const SizedBox(height: 16),
-
-              // Network Selector
-              if (selectedCoin != null) _buildNetworkSelector(cryptoVM),
-              if (selectedCoin != null) const SizedBox(height: 20),
-
-              if (selectedNetwork != null) ...[
-                // QR Code and Wallet Address Section
-                _buildQRCodeSection(),
-                const SizedBox(height: 10),
-                _buildWalletAddressSection(),
-                const SizedBox(height: 10),
-                _buildWarningMessage(),
-                const SizedBox(height: 20),
-
-                // Amount Input
-                _buildAmountInput(cryptoVM),
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () => context.hideKeyboard(),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Coin Selector
+                _buildCoinSelector(cryptoVM),
                 const SizedBox(height: 16),
 
-                // if (_amountController.text.isNotEmpty &&
-                //     double.tryParse(_amountController.text) != null &&
-                //     double.tryParse(_amountController.text)! > 0) ...[
-                //   // _buildRateDisplay(),
-                //   // const SizedBox(height: 20),
-                // ],
+                // Network Selector
+                if (selectedCoin != null) _buildNetworkSelector(cryptoVM),
+                if (selectedCoin != null) const SizedBox(height: 20),
 
-                // Rate Display
-                _buildRateDisplay(cryptoVM),
-                const SizedBox(height: 20),
+                if (selectedNetwork != null) ...[
+                  // QR Code and Wallet Address Section
+                  _buildQRCodeSection(),
+                  const SizedBox(height: 10),
+                  _buildWalletAddressSection(),
+                  const SizedBox(height: 10),
+                  _buildWarningMessage(),
+                  const SizedBox(height: 20),
 
-                // steps of images uploads
-                _imageInfo(),
-                const SizedBox(height: 15),
+                  // Amount Input
+                  _buildAmountInput(cryptoVM),
+                  const SizedBox(height: 16),
 
-                // Upload Image Section
-                _buildImageUploadSection(),
-                const SizedBox(height: 30),
+                  // if (_amountController.text.isNotEmpty &&
+                  //     double.tryParse(_amountController.text) != null &&
+                  //     double.tryParse(_amountController.text)! > 0) ...[
+                  //   // _buildRateDisplay(),
+                  //   // const SizedBox(height: 20),
+                  // ],
+
+                  // Rate Display
+                  _buildRateDisplay(cryptoVM),
+                  const SizedBox(height: 20),
+
+                  // steps of images uploads
+                  _imageInfo(),
+                  const SizedBox(height: 15),
+
+                  // Upload Image Section
+                  _buildImageUploadSection(),
+                  const SizedBox(height: 30),
+                ],
+
+                // Proceed Button
+                if (selectedNetwork != null) _buildProceedButton(),
               ],
-
-              // Proceed Button
-              if (selectedNetwork != null) _buildProceedButton(),
-            ],
+            ),
           ),
         ),
       ),
@@ -849,6 +853,10 @@ class _CoinScreenState extends State<CoinScreen> {
 
     if (mounted) {
       context.toastMsg("Uploading image(s)... [1/2]", color: Colors.green);
+      // hide the keyboard after 1sec
+      Future.delayed(const Duration(seconds: 1), () {
+        if (context.mounted) context.hideKeyboard();
+      });
     }
 
     uploadedUrls.clear();
@@ -883,6 +891,7 @@ class _CoinScreenState extends State<CoinScreen> {
   ) async {
     if (mounted) {
       context.toastMsg("Processing transaction... [2/2]", color: Colors.green);
+      context.hideKeyboard();
     }
 
     final payload = {

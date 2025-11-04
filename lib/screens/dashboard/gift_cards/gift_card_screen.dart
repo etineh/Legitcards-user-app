@@ -235,18 +235,21 @@ class _GiftCardScreenState extends State<GiftCardScreen> {
   }
 
   Widget _buildCardOption(GiftCardTradeVM viewModel) {
-    return Column(
-      children: [
-        const SizedBox(height: 12),
-        const CustomText(
-          text: "Select Gift Card Asset",
-          shouldBold: true,
-          size: 18,
-        ),
-        const SizedBox(height: 15),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: TextField(
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () => context.hideKeyboard(),
+      child: Column(
+        children: [
+          const SizedBox(height: 12),
+          const CustomText(
+            text: "Select Gift Card Asset",
+            shouldBold: true,
+            size: 18,
+          ),
+          const SizedBox(height: 15),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: TextField(
             controller: _searchController,
             style: TextStyle(color: context.blackWhite),
             onChanged: (value) {
@@ -280,6 +283,7 @@ class _GiftCardScreenState extends State<GiftCardScreen> {
         ),
         const SizedBox(height: 5),
       ],
+    ),
     );
   }
 
@@ -288,8 +292,11 @@ class _GiftCardScreenState extends State<GiftCardScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 15),
       child: ModalProgressHUD(
         inAsyncCall: giftCardVM.isLoading,
-        child: SingleChildScrollView(
-          child: Column(
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () => context.hideKeyboard(),
+          child: SingleChildScrollView(
+            child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               // Header with balance
@@ -333,6 +340,7 @@ class _GiftCardScreenState extends State<GiftCardScreen> {
             ],
           ),
         ),
+      ),
       ),
     );
   }
@@ -792,14 +800,17 @@ class _GiftCardScreenState extends State<GiftCardScreen> {
       builder: (context) => StatefulBuilder(
         // important for updating inside sheet
         builder: (context, setModalState) {
-          return Container(
-            height: MediaQuery.of(context).size.height * 0.9,
-            decoration: BoxDecoration(
-              color: context.backgroundColor,
-              borderRadius:
-                  const BorderRadius.vertical(top: Radius.circular(20)),
-            ),
-            child: Column(
+          return GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () => context.hideKeyboard(),
+            child: Container(
+              height: MediaQuery.of(context).size.height * 0.9,
+              decoration: BoxDecoration(
+                color: context.backgroundColor,
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(20)),
+              ),
+              child: Column(
               children: [
                 const SizedBox(height: 12),
                 // drag handle
@@ -856,6 +867,7 @@ class _GiftCardScreenState extends State<GiftCardScreen> {
                 ),
               ],
             ),
+          ),
           );
         },
       ),

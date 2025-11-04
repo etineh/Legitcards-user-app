@@ -79,13 +79,22 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       backgroundColor: context.backgroundColor,
       appBar: const CustomAppBar(title: "Edit Profile"),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(12),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () => context.hideKeyboard(),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(12),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: MediaQuery.of(context).size.height -
+                    MediaQuery.of(context).padding.top -
+                    kToolbarHeight - 24, // 24 is the padding (12 top + 12 bottom)
+              ),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
                 const SizedBox(height: 30),
 
                 // First Name Field
@@ -136,6 +145,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             ),
           ),
         ),
+        ),
+      ),
       ),
     );
   }

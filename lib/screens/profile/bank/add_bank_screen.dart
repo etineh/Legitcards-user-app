@@ -96,18 +96,21 @@ class _AddBankAccountScreenState extends State<AddBankAccountScreen> {
   Widget _buildAddBankForm(ProfileViewModel profileVM) {
     return ModalProgressHUD(
       inAsyncCall: profileVM.isLoading,
-      child: Container(
-        margin: const EdgeInsets.only(top: 24),
-        decoration: BoxDecoration(
-          color: context.cardColor,
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(24),
-            topRight: Radius.circular(24),
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => context.hideKeyboard(),
+        child: Container(
+          margin: const EdgeInsets.only(top: 24),
+          decoration: BoxDecoration(
+            color: context.cardColor,
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(24),
+              topRight: Radius.circular(24),
+            ),
           ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
             children: [
               // Account Number Field
               InputField(
@@ -215,21 +218,25 @@ class _AddBankAccountScreenState extends State<AddBankAccountScreen> {
           ),
         ),
       ),
+    ),
     );
   }
 
   // bank list for dropdown
   Widget _buildBankList(ProfileViewModel viewModel) {
-    return Container(
-      margin: const EdgeInsets.only(top: 24),
-      decoration: const BoxDecoration(
-        color: AppColors.lightPurple,
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(24),
-          topRight: Radius.circular(24),
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () => context.hideKeyboard(),
+      child: Container(
+        margin: const EdgeInsets.only(top: 24),
+        decoration: const BoxDecoration(
+          color: AppColors.lightPurple,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(24),
+            topRight: Radius.circular(24),
+          ),
         ),
-      ),
-      child: Column(
+        child: Column(
         children: [
           // Back button and Search
           Padding(
@@ -277,6 +284,7 @@ class _AddBankAccountScreenState extends State<AddBankAccountScreen> {
           ),
         ],
       ),
+    ),
     );
   }
 
@@ -367,7 +375,7 @@ class _AddBankAccountScreenState extends State<AddBankAccountScreen> {
     if (_isVerified) {
       _addBankAccount(viewModel);
     } else {
-      _verifyAccountName(_selectedBank, null);
+      _verifyAccountName(_selectedBank, viewModel);
     }
   }
 
@@ -394,6 +402,7 @@ class _AddBankAccountScreenState extends State<AddBankAccountScreen> {
       });
     } else {
       if (mounted) context.toastMsg("Invalid account number");
+      viewModel.setIsLoadingToFalse();
     }
   }
 

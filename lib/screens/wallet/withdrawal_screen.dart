@@ -108,15 +108,18 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
           padding: EdgeInsets.only(
             bottom: MediaQuery.of(context).viewInsets.bottom,
           ),
-          child: SingleChildScrollView(
-            child: Container(
-              decoration: BoxDecoration(
-                color: context.cardColor,
-                borderRadius:
-                    const BorderRadius.vertical(top: Radius.circular(20)),
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
-              child: Column(
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () => context.hideKeyboard(),
+            child: SingleChildScrollView(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: context.cardColor,
+                  borderRadius:
+                      const BorderRadius.vertical(top: Radius.circular(20)),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+                child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   // Drag handle
@@ -168,6 +171,7 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                 ],
               ),
             ),
+          ),
           ),
         );
       },
@@ -228,10 +232,19 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
       child: Scaffold(
         backgroundColor: context.backgroundColor,
         appBar: const CustomAppBar(title: "Withdrawal"),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
+        body: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () => context.hideKeyboard(),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: MediaQuery.of(context).size.height -
+                    MediaQuery.of(context).padding.top -
+                    kToolbarHeight - 32, // 32 is the padding (16 top + 16 bottom)
+              ),
+              child: Column(
+                children: [
               // Amount Input
               _buildAmountInput(walletVM),
               const SizedBox(height: 16),
@@ -252,6 +265,8 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
             ],
           ),
         ),
+        ),
+      ),
       ),
     );
   }
@@ -419,13 +434,16 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
   }
 
   Widget _buildBankAccountSheet() {
-    return Container(
-      decoration: BoxDecoration(
-        color: context.cardColor,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      padding: const EdgeInsets.all(24),
-      child: Column(
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () => context.hideKeyboard(),
+      child: Container(
+        decoration: BoxDecoration(
+          color: context.cardColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        padding: const EdgeInsets.all(24),
+        child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           // Drag handle
@@ -490,6 +508,7 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
           const SizedBox(height: 16),
         ],
       ),
+    ),
     );
   }
 

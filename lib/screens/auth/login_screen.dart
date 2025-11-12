@@ -92,113 +92,116 @@ class _SigninScreenState extends State<LoginScreen> {
       backgroundColor: context.backgroundColor,
       body: ModalProgressHUD(
         inAsyncCall: viewModel.isLoading,
-        child: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24.0),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Logo and App Name
-                  Center(
-                    child: Column(
-                      children: [
-                        const LogoWidget(size: 100.0),
-                        const SizedBox(height: 10),
-                        Text(
-                          'LegitCards',
-                          style: TextStyle(
-                            fontSize: 32,
-                            fontWeight: FontWeight.bold,
-                            color: context.blackWhite,
+        child: GestureDetector(
+          onTap: context.hideKeyboard,
+          child: SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(24.0),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Logo and App Name
+                    Center(
+                      child: Column(
+                        children: [
+                          const LogoWidget(size: 100.0),
+                          const SizedBox(height: 10),
+                          Text(
+                            'LegitCards',
+                            style: TextStyle(
+                              fontSize: 32,
+                              fontWeight: FontWeight.bold,
+                              color: context.blackWhite,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
 
-                  const SizedBox(height: 50),
+                    const SizedBox(height: 50),
 
-                  // Email Field
-                  userProfileM == null
-                      ? InputField(
-                          fillColor: context.cardColor,
-                          controller: _emailController,
-                          labelText: 'Email address',
-                          hintText: 'your@email.com',
-                          prefixIcon: Icons.email_outlined,
-                          keyboardType: TextInputType.emailAddress,
-                          textInputAction: TextInputAction.next,
-                          validator: _validationService.validateEmail,
-                        )
-                      : Center(
-                          child: CustomText(
-                            text: "Welcome ${userProfileM?.firstname}!",
-                            size: 20,
+                    // Email Field
+                    userProfileM == null
+                        ? InputField(
+                            fillColor: context.cardColor,
+                            controller: _emailController,
+                            labelText: 'Email address',
+                            hintText: 'your@email.com',
+                            prefixIcon: Icons.email_outlined,
+                            keyboardType: TextInputType.emailAddress,
+                            textInputAction: TextInputAction.next,
+                            validator: _validationService.validateEmail,
+                          )
+                        : Center(
+                            child: CustomText(
+                              text: "Welcome ${userProfileM?.firstname}!",
+                              size: 20,
+                            ),
                           ),
-                        ),
 
-                  const SizedBox(height: 20),
+                    const SizedBox(height: 20),
 
-                  // Password Field (Now last field)
-                  PasswordField(
-                    fillColor: context.cardColor,
-                    controller: _passwordController,
-                    labelText: 'Password',
-                    textInputAction: TextInputAction.done,
-                    // onFieldSubmitted: (_) => _signup(),
-                    validator: _validationService.validatePassword,
-                  ),
+                    // Password Field (Now last field)
+                    PasswordField(
+                      fillColor: context.cardColor,
+                      controller: _passwordController,
+                      labelText: 'Password',
+                      textInputAction: TextInputAction.done,
+                      // onFieldSubmitted: (_) => _signup(),
+                      validator: _validationService.validatePassword,
+                    ),
 
-                  const SizedBox(height: 25),
+                    const SizedBox(height: 25),
 
-                  // Sign Up Button
-                  PrimaryButton(
-                    text: 'Login',
-                    onPressed: () => _signin(viewModel),
-                    isLoading: viewModel.isLoading,
-                  ),
+                    // Sign Up Button
+                    PrimaryButton(
+                      text: 'Login',
+                      onPressed: () => _signin(viewModel),
+                      isLoading: viewModel.isLoading,
+                    ),
 
-                  const SizedBox(height: 12),
+                    const SizedBox(height: 12),
 
-                  // Forgot Password
-                  Align(
-                    alignment: Alignment.center,
-                    child: TextButton(
-                      onPressed: () {
-                        context.goNextScreen(K.requestCode);
-                      },
-                      child: Text(
-                        'Forgot Password?',
-                        style: TextStyle(
-                          color: context.purpleText,
-                          fontWeight: FontWeight.w500,
+                    // Forgot Password
+                    Align(
+                      alignment: Alignment.center,
+                      child: TextButton(
+                        onPressed: () {
+                          context.goNextScreen(K.requestCode);
+                        },
+                        child: Text(
+                          'Forgot Password?',
+                          style: TextStyle(
+                            color: context.purpleText,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
                     ),
-                  ),
 
-                  const SizedBox(height: 20),
+                    const SizedBox(height: 20),
 
-                  // Signin Link
-                  userProfileM == null
-                      ? signinLink(context)
-                      : Center(
-                          child: CustomText(
-                            size: 18,
-                            text: "Logout",
-                            color: Colors.orange,
-                            onTap: () {
-                              setState(() {
-                                userProfileM = null;
-                              });
-                              CacheUtils.logout(context);
-                              _emailController.text = "";
-                            },
+                    // Signin Link
+                    userProfileM == null
+                        ? signinLink(context)
+                        : Center(
+                            child: CustomText(
+                              size: 18,
+                              text: "Logout",
+                              color: Colors.orange,
+                              onTap: () {
+                                setState(() {
+                                  userProfileM = null;
+                                });
+                                CacheUtils.logout(context);
+                                _emailController.text = "";
+                              },
+                            ),
                           ),
-                        ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

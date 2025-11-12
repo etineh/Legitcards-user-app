@@ -461,7 +461,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
-				DEVELOPMENT_TEAM = DSKVHFLWFP;
+				DEVELOPMENT_TEAM = FRV5P4S34U;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Legit Cards";
@@ -471,7 +471,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1;
-				PRODUCT_BUNDLE_IDENTIFIER = com.wegatel.legitCards;
+				PRODUCT_BUNDLE_IDENTIFIER = com.legitcards.users;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
@@ -646,7 +646,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
-				DEVELOPMENT_TEAM = DSKVHFLWFP;
+				DEVELOPMENT_TEAM = FRV5P4S34U;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Legit Cards";
@@ -656,7 +656,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1;
-				PRODUCT_BUNDLE_IDENTIFIER = com.wegatel.legitCards;
+				PRODUCT_BUNDLE_IDENTIFIER = com.legitcards.users;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -674,7 +674,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
-				DEVELOPMENT_TEAM = DSKVHFLWFP;
+				DEVELOPMENT_TEAM = FRV5P4S34U;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Legit Cards";
@@ -684,7 +684,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1;
-				PRODUCT_BUNDLE_IDENTIFIER = com.wegatel.legitCards;
+				PRODUCT_BUNDLE_IDENTIFIER = com.legitcards.users;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;

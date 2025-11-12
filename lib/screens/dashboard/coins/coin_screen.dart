@@ -853,10 +853,6 @@ class _CoinScreenState extends State<CoinScreen> {
 
     if (mounted) {
       context.toastMsg("Uploading image(s)... [1/2]", color: Colors.green);
-      // hide the keyboard after 1sec
-      Future.delayed(const Duration(seconds: 1), () {
-        if (context.mounted) context.hideKeyboard();
-      });
     }
 
     uploadedUrls.clear();

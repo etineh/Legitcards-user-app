@@ -100,7 +100,8 @@ extension ContextExtensions on BuildContext {
   }
 
   void hideKeyboard() {
-    FocusScope.of(this).unfocus(); // hide keyboard
+    // FocusScope.of(this).unfocus(); // hide keyboard
+    FocusManager.instance.primaryFocus?.unfocus();
   }
 
   void copyText({String textToCopy = ""}) {

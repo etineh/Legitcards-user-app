@@ -355,13 +355,12 @@ class _MyAppState extends State<MyApp> {
       themeMode: ThemeMode.system,
       debugShowCheckedModeBanner: false,
       builder: (context, child) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
         SystemChrome.setSystemUIOverlayStyle(
           SystemUiOverlayStyle(
             statusBarColor: Colors.transparent,
-            statusBarIconBrightness:
-                Theme.of(context).brightness == Brightness.dark
-                    ? Brightness.light
-                    : Brightness.dark,
+            statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+            statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
           ),
         );
 

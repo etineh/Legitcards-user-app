@@ -84,6 +84,19 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  Future<void> _refreshBalance() async {
+    final walletVM = Provider.of<WalletViewModel>(context, listen: false);
+    if (userProfileM == null) return;
+    await walletVM.fetchBalance(userProfileM!, context: context);
+
+    // check if there is unread notification
+    final isUnread =
+        await SecureStorageRepo.notificationIsUnread(userProfileM!);
+    setState(() {
+      notificationIsUnread = isUnread;
+    });
+  }
+
   void fetchCryptoRates() {
     if (userProfileM == null) return;
 
@@ -95,27 +108,31 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     // WalletViewModel walletVM = Provider.of<WalletViewModel>(context);
-    return SingleChildScrollView(
-      child: Container(
-        margin: const EdgeInsets.all(15),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            /// Greeting + avatar
-            _header(),
-            const SizedBox(height: 20),
+    return RefreshIndicator(
+      onRefresh: _refreshBalance,
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: Container(
+          margin: const EdgeInsets.all(15),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              /// Greeting + avatar
+              _header(),
+              const SizedBox(height: 20),
 
-            /// Wallet Balance Card
-            _wallet(),
-            const SizedBox(height: 20),
+              /// Wallet Balance Card
+              _wallet(),
+              const SizedBox(height: 20),
 
-            /// Card and Crypto Action Buttons
-            _cardAndCryptoButton(),
-            const SizedBox(height: 30),
+              /// Card and Crypto Action Buttons
+              _cardAndCryptoButton(),
+              const SizedBox(height: 30),
 
-            // hot cards
-            _hotCards()
-          ],
+              // hot cards
+              _hotCards()
+            ],
+          ),
         ),
       ),
     );

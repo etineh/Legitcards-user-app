@@ -1,8 +1,8 @@
 import 'dart:io';
 
 class K {
-  // static String baseUrl = "https://legitcards-api.onrender.com";
-  static String baseUrl = "https://legitcards.ng";
+  static String baseUrl = "https://legitcards-api.onrender.com";
+  // static String baseUrl = "https://legitcards.ng";
 // static String baseUrl = "http://192.168.0.171:8080";
 
   static const dashboardScreen = "/";

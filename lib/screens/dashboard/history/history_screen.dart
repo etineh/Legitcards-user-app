@@ -38,7 +38,6 @@ class _HistoryScreenState extends State<HistoryScreen>
     _tabController = TabController(length: 3, vsync: this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _fetchCardAndCryptoTransactions();
-      _fetchCardAndCryptoTransactions();
       _fetchWithdrawTransactions();
     });
     _navigateToCoinTab();
@@ -156,65 +155,82 @@ class _HistoryScreenState extends State<HistoryScreen>
   }
 
   Widget _buildCardsTab(HistoryViewModel historyViewModel) {
-    if (historyViewModel.cardHistory.isEmpty) {
-      return _buildEmptyState('No card transactions yet');
-    }
-
-    return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      itemCount: historyViewModel.cardHistory.length,
-      itemBuilder: (context, index) {
-        final transaction = historyViewModel.cardHistory[index];
-        return InkWell(
-          onTap: () => _openTradeHistory(transaction),
-          child: _buildTransactionCard(transaction),
-        );
+    return RefreshIndicator(
+      onRefresh: () async {
+        CacheUtils.reloadCardTab = true;
+        _fetchWithdrawTransactions();
+        await _fetchCardAndCryptoTransactions();
       },
+      child: historyViewModel.cardHistory.isEmpty
+          ? _buildEmptyState('No card transactions yet')
+          : ListView.builder(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              itemCount: historyViewModel.cardHistory.length,
+              itemBuilder: (context, index) {
+                final transaction = historyViewModel.cardHistory[index];
+                return InkWell(
+                  onTap: () => _openTradeHistory(transaction),
+                  child: _buildTransactionCard(transaction),
+                );
+              },
+            ),
     );
   }
 
   Widget _buildCoinsTab(HistoryViewModel historyViewModel) {
-    if (historyViewModel.coinHistory.isEmpty) {
-      return _buildEmptyState('No coin— transactions yet');
-    }
-
-    return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      itemCount: historyViewModel.coinHistory.length,
-      itemBuilder: (context, index) {
-        final transaction = historyViewModel.coinHistory[index];
-        return InkWell(
-          onTap: () => _openTradeHistory(transaction, from: K.COIN),
-          child: _buildTransactionCard(transaction),
-        );
+    return RefreshIndicator(
+      onRefresh: () async {
+        CacheUtils.reloadCardTab = true;
+        _fetchWithdrawTransactions();
+        await _fetchCardAndCryptoTransactions();
       },
+      child: historyViewModel.coinHistory.isEmpty
+          ? _buildEmptyState('No coin— transactions yet')
+          : ListView.builder(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              itemCount: historyViewModel.coinHistory.length,
+              itemBuilder: (context, index) {
+                final transaction = historyViewModel.coinHistory[index];
+                return InkWell(
+                  onTap: () => _openTradeHistory(transaction, from: K.COIN),
+                  child: _buildTransactionCard(transaction),
+                );
+              },
+            ),
     );
   }
 
   Widget _buildWithdrawTab(HistoryViewModel historyViewModel) {
-    if (historyViewModel.withdrawRecords.isEmpty) {
-      return _buildEmptyState('No card transactions yet');
-    }
-
     // Sort by date (newest first)
-    historyViewModel.withdrawRecords
-        .sort((a, b) => (b.createdAt ?? '').compareTo(a.createdAt ?? ''));
-
-    if (historyViewModel.withdrawRecords.isEmpty) {
-      return _buildEmptyState('No withdrawal history yet');
+    if (historyViewModel.withdrawRecords.isNotEmpty) {
+      historyViewModel.withdrawRecords
+          .sort((a, b) => (b.createdAt ?? '').compareTo(a.createdAt ?? ''));
     }
 
-    return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      itemCount: historyViewModel.withdrawRecords.length,
-      itemBuilder: (context, index) {
-        final withdraw = historyViewModel.withdrawRecords[index];
-        return InkWell(
-          onTap: () => context.goNextScreenWithData(K.withdrawReceiptScreen,
-              extra: withdraw),
-          child: _buildWithdrawCard(withdraw),
-        );
+    return RefreshIndicator(
+      onRefresh: () async {
+        CacheUtils.reloadCardTab = true;
+        _fetchWithdrawTransactions();
+        await _fetchCardAndCryptoTransactions();
       },
+      child: historyViewModel.withdrawRecords.isEmpty
+          ? _buildEmptyState('No withdrawal history yet')
+          : ListView.builder(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              itemCount: historyViewModel.withdrawRecords.length,
+              itemBuilder: (context, index) {
+                final withdraw = historyViewModel.withdrawRecords[index];
+                return InkWell(
+                  onTap: () => context.goNextScreenWithData(
+                      K.withdrawReceiptScreen,
+                      extra: withdraw),
+                  child: _buildWithdrawCard(withdraw),
+                );
+              },
+            ),
     );
   }
 
@@ -379,25 +395,33 @@ class _HistoryScreenState extends State<HistoryScreen>
   }
 
   Widget _buildEmptyState(String message) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.receipt_long_outlined,
-            size: 80,
-            color: Colors.grey[300],
-          ),
-          const SizedBox(height: 16),
-          Text(
-            message,
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey[600],
+    return ListView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      children: [
+        SizedBox(
+          height: MediaQuery.of(context).size.height * 0.5,
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.receipt_long_outlined,
+                  size: 80,
+                  color: Colors.grey[300],
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  message,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey[600],
+                  ),
+                ),
+              ],
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 

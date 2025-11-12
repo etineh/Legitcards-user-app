@@ -116,144 +116,147 @@ class _SignupScreenState extends State<SignupScreen> {
       body: ModalProgressHUD(
         inAsyncCall: viewModel.isLoading,
         child: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24.0),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Logo and App Name
-                  Center(
-                    child: Column(
-                      children: [
-                        const LogoWidget(size: 100.0),
-                        const SizedBox(height: 10),
-                        Text(
-                          'LegitCards',
-                          style: TextStyle(
-                            fontSize: 32,
-                            fontWeight: FontWeight.bold,
-                            color: context.blackWhite,
+          child: GestureDetector(
+            onTap: context.hideKeyboard,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(24.0),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Logo and App Name
+                    Center(
+                      child: Column(
+                        children: [
+                          const LogoWidget(size: 100.0),
+                          const SizedBox(height: 10),
+                          Text(
+                            'LegitCards',
+                            style: TextStyle(
+                              fontSize: 32,
+                              fontWeight: FontWeight.bold,
+                              color: context.blackWhite,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
 
-                  const SizedBox(height: 25),
+                    const SizedBox(height: 25),
 
-                  const SizedBox(height: 20),
+                    const SizedBox(height: 20),
 
-                  // Full Name Field
-                  InputField(
-                    fillColor: context.cardColor,
-                    controller: _fullNameController,
-                    labelText: 'Enter your full name',
-                    hintText: 'e.g John Hin',
-                    prefixIcon: Icons.person_outline,
-                    keyboardType: TextInputType.name,
-                    validator: _validationService.validateFullName,
-                  ),
+                    // Full Name Field
+                    InputField(
+                      fillColor: context.cardColor,
+                      controller: _fullNameController,
+                      labelText: 'Enter your full name',
+                      hintText: 'e.g John Hin',
+                      prefixIcon: Icons.person_outline,
+                      keyboardType: TextInputType.name,
+                      validator: _validationService.validateFullName,
+                    ),
 
-                  const SizedBox(height: 10),
+                    const SizedBox(height: 10),
 
-                  // Phone Number Field
-                  InputField(
-                    fillColor: context.cardColor,
-                    controller: _phoneNumberController,
-                    labelText: 'Enter phone number',
-                    hintText: 'e.g 09076600660',
-                    keyboardType: TextInputType.phone,
-                    prefixIcon: Icons.phone,
-                    inputFormatters: [
-                      FilteringTextInputFormatter.digitsOnly,
-                    ],
-                    validator: _validationService.validatePhone,
-                  ),
+                    // Phone Number Field
+                    InputField(
+                      fillColor: context.cardColor,
+                      controller: _phoneNumberController,
+                      labelText: 'Enter phone number',
+                      hintText: 'e.g 09076600660',
+                      keyboardType: TextInputType.phone,
+                      prefixIcon: Icons.phone,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                      ],
+                      validator: _validationService.validatePhone,
+                    ),
 
-                  const SizedBox(height: 10),
+                    const SizedBox(height: 10),
 
-                  // Email Field
-                  InputField(
-                    fillColor: context.cardColor,
-                    controller: _emailController,
-                    labelText: 'Enter your email address',
-                    hintText: 'your@email.com',
-                    prefixIcon: Icons.email_outlined,
-                    keyboardType: TextInputType.emailAddress,
-                    textInputAction: TextInputAction.next,
-                    validator: _validationService.validateEmail,
-                  ),
+                    // Email Field
+                    InputField(
+                      fillColor: context.cardColor,
+                      controller: _emailController,
+                      labelText: 'Enter your email address',
+                      hintText: 'your@email.com',
+                      prefixIcon: Icons.email_outlined,
+                      keyboardType: TextInputType.emailAddress,
+                      textInputAction: TextInputAction.next,
+                      validator: _validationService.validateEmail,
+                    ),
 
-                  const SizedBox(height: 10),
+                    const SizedBox(height: 10),
 
-                  // Password Field (Now last field)
-                  PasswordField(
-                    fillColor: context.cardColor,
-                    controller: _passwordController,
-                    labelText: 'Enter a strong password',
-                    textInputAction: TextInputAction.done,
-                    // onFieldSubmitted: (_) => _signup(),
-                    validator: _validationService.validatePassword,
-                  ),
+                    // Password Field (Now last field)
+                    PasswordField(
+                      fillColor: context.cardColor,
+                      controller: _passwordController,
+                      labelText: 'Enter a strong password',
+                      textInputAction: TextInputAction.done,
+                      // onFieldSubmitted: (_) => _signup(),
+                      validator: _validationService.validatePassword,
+                    ),
 
-                  const SizedBox(height: 10),
+                    const SizedBox(height: 10),
 
-                  // Gender Radio Group
-                  Center(
-                    child: RadioGroup<String>(
-                      initialValue: _gender,
+                    // Gender Radio Group
+                    Center(
+                      child: RadioGroup<String>(
+                        initialValue: _gender,
+                        onChanged: (value) {
+                          setState(() {
+                            _gender = value;
+                          });
+                        },
+                        options: const [
+                          RadioOption(value: 'Male', label: 'Male'),
+                          RadioOption(value: 'Female', label: 'Female'),
+                        ],
+                        activeColor: AppColors.lightPurple,
+                        textColor: context.blackWhite,
+                        spacing: 30.0,
+                      ),
+                    ),
+
+                    // Terms and Conditions
+                    TermsCheckbox(
+                      value: _termsAccepted,
                       onChanged: (value) {
                         setState(() {
-                          _gender = value;
+                          _termsAccepted = value;
                         });
                       },
-                      options: const [
-                        RadioOption(value: 'Male', label: 'Male'),
-                        RadioOption(value: 'Female', label: 'Female'),
-                      ],
-                      activeColor: AppColors.lightPurple,
-                      textColor: context.blackWhite,
-                      spacing: 30.0,
+                      onPrivacyPolicyTap: () => _launchUrl(
+                          'https://legitcards.com.ng/privacy-policy.php'),
+                      onTermsTap: () =>
+                          _launchUrl('https://legitcards.com.ng/terms.php'),
+                      prefixText:
+                          'By clicking Sign Up, you have read and agreed to our ',
                     ),
-                  ),
 
-                  // Terms and Conditions
-                  TermsCheckbox(
-                    value: _termsAccepted,
-                    onChanged: (value) {
-                      setState(() {
-                        _termsAccepted = value;
-                      });
-                    },
-                    onPrivacyPolicyTap: () => _launchUrl(
-                        'https://legitcards.com.ng/privacy-policy.php'),
-                    onTermsTap: () =>
-                        _launchUrl('https://legitcards.com.ng/terms.php'),
-                    prefixText:
-                        'By clicking Sign Up, you have read and agreed to our ',
-                  ),
+                    const SizedBox(height: 20),
 
-                  const SizedBox(height: 20),
+                    // Sign Up Button
+                    PrimaryButton(
+                      text: 'Sign Up',
+                      onPressed: () => _signup(viewModel),
+                      isLoading: viewModel.isLoading,
+                    ),
 
-                  // Sign Up Button
-                  PrimaryButton(
-                    text: 'Sign Up',
-                    onPressed: () => _signup(viewModel),
-                    isLoading: viewModel.isLoading,
-                  ),
+                    const SizedBox(height: 24),
 
-                  const SizedBox(height: 24),
+                    // Divider with "or" text
+                    dividerWithOr(context),
 
-                  // Divider with "or" text
-                  dividerWithOr(context),
+                    const SizedBox(height: 5),
 
-                  const SizedBox(height: 5),
-
-                  // Login Link
-                  loginLink(context),
-                ],
+                    // Login Link
+                    loginLink(context),
+                  ],
+                ),
               ),
             ),
           ),

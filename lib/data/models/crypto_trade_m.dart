@@ -34,9 +34,9 @@ class CryptoRateResponse {
     };
   }
 
-  factory CryptoRateResponse.error(String msg) {
+  factory CryptoRateResponse.error(String msg, {String? statusCode}) {
     return CryptoRateResponse(
-      statusCode: 'ERROR',
+      statusCode: statusCode ?? 'ERROR',
       message: msg,
       status: 404,
       data: null,
@@ -173,9 +173,9 @@ class CryptoTransactionResM {
     );
   }
 
-  factory CryptoTransactionResM.error(String msg) {
+  factory CryptoTransactionResM.error(String msg, {String? statusCode}) {
     return CryptoTransactionResM(
-      statusCode: 'ERROR',
+      statusCode: statusCode ?? 'ERROR',
       message: msg,
       status: 404,
       data: null,

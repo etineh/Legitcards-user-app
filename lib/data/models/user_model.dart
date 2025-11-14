@@ -33,9 +33,9 @@ class ProfileResponseM {
   }
 
   // error fallback model
-  factory ProfileResponseM.error(String msg) {
+  factory ProfileResponseM.error(String msg, {String? statusCode}) {
     return ProfileResponseM(
-      statusCode: "Failed",
+      statusCode: statusCode ?? "Failed",
       status: 404,
       message: msg,
       data: null,

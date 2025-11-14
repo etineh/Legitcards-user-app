@@ -46,7 +46,7 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   Future<void> _signup(AuthViewModel authViewModel) async {
-    FocusScope.of(context).unfocus(); // hide keyboard
+    context.hideKeyboard(); // hide keyboard
 
     if (!_formKey.currentState!.validate()) return;
 
@@ -78,6 +78,15 @@ class _SignupScreenState extends State<SignupScreen> {
         username: AdjustUtils.generateUsername(fullName),
       );
 
+      if (AdjustUtils.getFirstName(fullName).length < 3) {
+        context.toastMsg("Invalid Firstname");
+        return;
+      }
+      if (AdjustUtils.getLastName(fullName).length < 3) {
+        context.toastMsg("Invalid Lastname");
+        return;
+      }
+
       final deviceDetails = await DeviceUtils.getDeviceDetails();
 
       final signModel = SignModel(
@@ -90,15 +99,16 @@ class _SignupScreenState extends State<SignupScreen> {
       );
 
       final response = await authViewModel.signup(signModel); // signup user
-      if (mounted) context.toastMsg(response.message, color: Colors.green);
 
-      if (response.status != 201) return;
-
-      // print("General log: sign up complete ${response.message}");
-      final userWithEmail = UserNavigationData(
-          updateUserM: user, email: email, signIn: signModel);
-      if (mounted) {
-        context.goNextScreenWithData(K.otpPath, extra: userWithEmail);
+      if (response.status == 201 ||
+          response.statusCode == "EMAIL_EXISTS: RESEND_OTP") {
+        final userWithEmail = UserNavigationData(
+            updateUserM: user, email: email, signIn: signModel);
+        if (mounted) {
+          context.goNextScreenWithData(K.otpPath, extra: userWithEmail);
+        }
+      } else {
+        if (mounted) context.toastMsg(response.message);
       }
     } catch (e) {
       if (mounted) {

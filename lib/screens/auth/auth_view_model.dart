@@ -112,7 +112,8 @@ class AuthViewModel extends ChangeNotifier {
       // user has 2fa login screen to enter 2fa code
       context.goNextScreenWithData(K.login2Fa, extra: signModel);
     } else {
-      context.toastMsg(signRes.message);
+      // print("General log: the resss lgin is $signRes");
+      context.toastMsg(signRes.message, timeInSec: 6);
     }
   }
 }

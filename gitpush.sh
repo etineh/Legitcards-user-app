@@ -1,5 +1,5 @@
 #!/bin/bash
-
+chmod +x gitpush.sh
 # Prompt for commit message
 read -p "Enter commit message: " commit_message
 

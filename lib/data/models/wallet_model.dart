@@ -169,7 +169,7 @@ class WithdrawalResponse {
     };
   }
 
-  factory WithdrawalResponse.error(String msg) {
+  factory WithdrawalResponse.error(String msg, {String? statusCode}) {
     return WithdrawalResponse(
       status: msg,
       // message: msg,

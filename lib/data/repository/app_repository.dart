@@ -30,7 +30,8 @@ class AppRepository {
       return await _authApi.createUser(user);
     } catch (e) {
       return checkError(e,
-          createError: (String message) => ApiResponseM.error(message));
+          createError: (String message, {String? statusCode}) =>
+              ApiResponseM.error(message, statusCode: statusCode));
     }
   }
 
@@ -39,7 +40,8 @@ class AppRepository {
       return await _authApi.signIn(user);
     } catch (e) {
       return checkError(e,
-          createError: (String message) => ApiResponseM.error(message));
+          createError: (String message, {String? statusCode}) =>
+              ApiResponseM.error(message, statusCode: statusCode));
     }
   }
 
@@ -48,7 +50,8 @@ class AppRepository {
       return await _authApi.loginWith2Fa(user);
     } catch (e) {
       return checkError(e,
-          createError: (String message) => ApiResponseM.error(message));
+          createError: (String message, {String? statusCode}) =>
+              ApiResponseM.error(message, statusCode: statusCode));
     }
   }
 
@@ -57,7 +60,8 @@ class AppRepository {
       return await _authApi.requestCode(emailMap);
     } catch (e) {
       return checkError(e,
-          createError: (String message) => ApiResponseM.error(message));
+          createError: (String message, {String? statusCode}) =>
+              ApiResponseM.error(message, statusCode: statusCode));
     }
   }
 
@@ -66,7 +70,8 @@ class AppRepository {
       return await _authApi.resetPassword(resetMap);
     } catch (e) {
       return checkError(e,
-          createError: (String message) => ApiResponseM.error(message));
+          createError: (String message, {String? statusCode}) =>
+              ApiResponseM.error(message, statusCode: statusCode));
     }
   }
 
@@ -75,7 +80,8 @@ class AppRepository {
       return await _authApi.activateAccount(request);
     } catch (e) {
       return checkError(e,
-          createError: (String message) => ApiResponseM.error(message));
+          createError: (String message, {String? statusCode}) =>
+              ApiResponseM.error(message, statusCode: statusCode));
     }
   }
 
@@ -84,7 +90,8 @@ class AppRepository {
       return await _authApi.resendCode(email);
     } catch (e) {
       return checkError(e,
-          createError: (String message) => ApiResponseM.error(message));
+          createError: (String message, {String? statusCode}) =>
+              ApiResponseM.error(message, statusCode: statusCode));
     }
   }
 
@@ -93,7 +100,8 @@ class AppRepository {
       return await _authApi.updateNewUserProfile(user);
     } catch (e) {
       return checkError(e,
-          createError: (String message) => ApiResponseM.error(message));
+          createError: (String message, {String? statusCode}) =>
+              ApiResponseM.error(message, statusCode: statusCode));
     }
   }
 
@@ -113,7 +121,8 @@ class AppRepository {
       return userRes;
     } catch (e) {
       return checkError(e,
-          createError: (String message) => ProfileResponseM.error(message));
+          createError: (String message, {String? statusCode}) =>
+              ProfileResponseM.error(message, statusCode: statusCode));
     }
   }
 
@@ -123,7 +132,8 @@ class AppRepository {
       return await _profileApi.editProfile(profileMap, token);
     } catch (e) {
       return checkError(e,
-          createError: (String message) => ProfileResponseM.error(message));
+          createError: (String message, {String? statusCode}) =>
+              ProfileResponseM.error(message, statusCode: statusCode));
     }
   }
 
@@ -133,7 +143,8 @@ class AppRepository {
       return await _profileApi.changePassword(passwordMap, token);
     } catch (e) {
       return checkError(e,
-          createError: (String message) => ProfileResponseM.error(message));
+          createError: (String message, {String? statusCode}) =>
+              ProfileResponseM.error(message, statusCode: statusCode));
     }
   }
 
@@ -143,7 +154,8 @@ class AppRepository {
       return await _profileApi.sendOtpForPin(fieldMap, token);
     } catch (e) {
       return checkError(e,
-          createError: (String message) => ProfileResponseM.error(message));
+          createError: (String message, {String? statusCode}) =>
+              ProfileResponseM.error(message, statusCode: statusCode));
     }
   }
 
@@ -153,7 +165,8 @@ class AppRepository {
       return await _profileApi.setPin(fieldMap, token);
     } catch (e) {
       return checkError(e,
-          createError: (String message) => ProfileResponseM.error(message));
+          createError: (String message, {String? statusCode}) =>
+              ProfileResponseM.error(message, statusCode: statusCode));
     }
   }
 
@@ -163,7 +176,8 @@ class AppRepository {
       return await _profileApi.enable2Fa(fieldMap, token);
     } catch (e) {
       return checkError(e,
-          createError: (String message) => ProfileResponseM.error(message));
+          createError: (String message, {String? statusCode}) =>
+              ProfileResponseM.error(message, statusCode: statusCode));
     }
   }
 
@@ -173,7 +187,8 @@ class AppRepository {
       return await _profileApi.disable2Fa(fieldMap, token);
     } catch (e) {
       return checkError(e,
-          createError: (String message) => ProfileResponseM.error(message));
+          createError: (String message, {String? statusCode}) =>
+              ProfileResponseM.error(message, statusCode: statusCode));
     }
   }
 
@@ -182,7 +197,8 @@ class AppRepository {
       return await _profileApi.allowed2FaType(user);
     } catch (e) {
       return checkError(e,
-          createError: (String message) => ProfileResponseM.error(message));
+          createError: (String message, {String? statusCode}) =>
+              ProfileResponseM.error(message, statusCode: statusCode));
     }
   }
 
@@ -192,7 +208,8 @@ class AppRepository {
       return await _profileApi.sendCode2Fa(fieldMap, token);
     } catch (e) {
       return checkError(e,
-          createError: (String message) => ProfileResponseM.error(message));
+          createError: (String message, {String? statusCode}) =>
+              ProfileResponseM.error(message, statusCode: statusCode));
     }
   }
 
@@ -201,7 +218,8 @@ class AppRepository {
       return await _profileApi.getBanks();
     } catch (e) {
       return checkError(e,
-          createError: (String message) => ProfileResponseM.error(message));
+          createError: (String message, {String? statusCode}) =>
+              ProfileResponseM.error(message, statusCode: statusCode));
     }
   }
 
@@ -210,7 +228,8 @@ class AppRepository {
       return await _profileApi.verifyAccount(payload);
     } catch (e) {
       return checkError(e,
-          createError: (String message) => ProfileResponseM.error(message));
+          createError: (String message, {String? statusCode}) =>
+              ProfileResponseM.error(message, statusCode: statusCode));
     }
   }
 
@@ -220,7 +239,8 @@ class AppRepository {
       return await _profileApi.addBankAccount(payload, token);
     } catch (e) {
       return checkError(e,
-          createError: (String message) => ProfileResponseM.error(message));
+          createError: (String message, {String? statusCode}) =>
+              ProfileResponseM.error(message, statusCode: statusCode));
     }
   }
 
@@ -229,7 +249,8 @@ class AppRepository {
       return await _profileApi.getMyBankInfo(user);
     } catch (e) {
       return checkError(e,
-          createError: (String message) => BankAccountsResponse.error(message));
+          createError: (String message, {String? statusCode}) =>
+              BankAccountsResponse.error(message, statusCode: statusCode));
     }
   }
 
@@ -239,7 +260,8 @@ class AppRepository {
       return await _profileApi.deleteBankAccount(payload, token);
     } catch (e) {
       return checkError(e,
-          createError: (String message) => ProfileResponseM.error(message));
+          createError: (String message, {String? statusCode}) =>
+              ProfileResponseM.error(message, statusCode: statusCode));
     }
   }
 
@@ -249,7 +271,8 @@ class AppRepository {
       return await _profileApi.deleteAccount(payload, token);
     } catch (e) {
       return checkError(e,
-          createError: (String message) => ProfileResponseM.error(message));
+          createError: (String message, {String? statusCode}) =>
+              ProfileResponseM.error(message, statusCode: statusCode));
     }
   }
 
@@ -260,7 +283,8 @@ class AppRepository {
       return await _giftCardApi.fetchAllAssets(token);
     } catch (e) {
       return checkError(e,
-          createError: (String message) => GiftCardResponseM.error(message));
+          createError: (String message, {String? statusCode}) =>
+              GiftCardResponseM.error(message, statusCode: statusCode));
     }
   }
 
@@ -270,7 +294,8 @@ class AppRepository {
       return await _giftCardApi.fetchAssetRate(user, assetId);
     } catch (e) {
       return checkError(e,
-          createError: (String message) => GiftCardRateResM.error(message));
+          createError: (String message, {String? statusCode}) =>
+              GiftCardRateResM.error(message, statusCode: statusCode));
     }
   }
 
@@ -280,7 +305,8 @@ class AppRepository {
       return await _giftCardApi.sellGiftCard(fieldMap, token);
     } catch (e) {
       return checkError(e,
-          createError: (String message) => GiftCardResponseM.error(message));
+          createError: (String message, {String? statusCode}) =>
+              GiftCardResponseM.error(message, statusCode: statusCode));
     }
   }
 
@@ -290,7 +316,8 @@ class AppRepository {
       return await _giftCardApi.cancelTrade(user, tradeId, from);
     } catch (e) {
       return checkError(e,
-          createError: (String message) => GiftCardResponseM.error(message));
+          createError: (String message, {String? statusCode}) =>
+              GiftCardResponseM.error(message, statusCode: statusCode));
     }
   }
 
@@ -303,7 +330,8 @@ class AppRepository {
       return await _giftCardApi.getTradeHistory(payload, token, from: from);
     } catch (e) {
       return checkError(e,
-          createError: (String message) => HistoryResponseM.error(message));
+          createError: (String message, {String? statusCode}) =>
+              HistoryResponseM.error(message, statusCode));
     }
   }
 
@@ -316,10 +344,9 @@ class AppRepository {
     try {
       return await _cryptoApi.fetchCryptoRate(user, coinName);
     } catch (e) {
-      return checkError(
-        e,
-        createError: (String message) => CryptoRateResponse.error(message),
-      );
+      return checkError(e,
+          createError: (String message, {String? statusCode}) =>
+              CryptoRateResponse.error(message, statusCode: statusCode));
     }
   }
 
@@ -330,10 +357,9 @@ class AppRepository {
     try {
       return await _cryptoApi.sellCrypto(fieldMap, token);
     } catch (e) {
-      return checkError(
-        e,
-        createError: (String message) => CryptoTransactionResM.error(message),
-      );
+      return checkError(e,
+          createError: (String message, {String? statusCode}) =>
+              CryptoTransactionResM.error(message, statusCode: statusCode));
     }
   }
 
@@ -344,8 +370,8 @@ class AppRepository {
       return await _walletApi.fetchBalance(user);
     } catch (e) {
       return checkError(e,
-          createError: (String message) =>
-              WalletBalanceResponse.error(message));
+          createError: (String message, {String? statusCode}) =>
+              WalletBalanceResponse.error(message, statusCode: statusCode));
     }
   }
 
@@ -355,7 +381,8 @@ class AppRepository {
       return await _walletApi.withdraw(fieldMap, token);
     } catch (e) {
       return checkError(e,
-          createError: (String message) => WithdrawalResponse.error(message));
+          createError: (String message, {String? statusCode}) =>
+              WithdrawalResponse.error(message));
     }
   }
 
@@ -364,7 +391,8 @@ class AppRepository {
       return await _walletApi.fetchWithdrawRecords(userId);
     } catch (e) {
       return checkError(e,
-          createError: (String message) => WithdrawRecordResM.error(message));
+          createError: (String message, {String? statusCode}) =>
+              WithdrawRecordResM.error(message));
     }
   }
 
@@ -403,13 +431,19 @@ class AppRepository {
 // reusable method
   Future<T> checkError<T>(
     dynamic e, {
-    required T Function(String message) createError,
+    required T Function(String message, {String? statusCode}) createError,
   }) async {
+    String message = e.toString();
+    String statusCode = 'Failed';
+    if (e is Map) {
+      message = e['message'];
+      statusCode = e['statusCode'];
+    }
     return await checkNetwork().then((networkIsOkay) {
       if (networkIsOkay) {
-        return createError('Error: ${e.toString()}');
+        return createError('Error: $message', statusCode: statusCode);
       } else {
-        return createError('No network connection');
+        return createError('No network connection', statusCode: statusCode);
       }
     });
   }

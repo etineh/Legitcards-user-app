@@ -11,12 +11,12 @@ flutter pub get
 cd ios && pod install && cd ..
 ```
 
+#for playstore production
 ```bash
 flutter build appbundle --release
 ```
 
 #push to github. Prompt me a message to enter, then prompt a branch to push
 ```bash
-chmod +x gitpush.sh
 ./gitpush.sh
 ```

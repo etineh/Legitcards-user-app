@@ -24,9 +24,9 @@ class BankAccountsResponse {
   }
 
   // error fallback model
-  factory BankAccountsResponse.error(String msg) {
+  factory BankAccountsResponse.error(String msg, {String? statusCode}) {
     return BankAccountsResponse(
-      statusCode: "Failed",
+      statusCode: statusCode ?? "Failed",
       status: 404,
       message: msg,
       data: null,

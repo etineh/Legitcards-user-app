@@ -21,9 +21,9 @@ class GiftCardResponseM {
     );
   }
 
-  factory GiftCardResponseM.error(String msg) {
+  factory GiftCardResponseM.error(String msg, {String? statusCode}) {
     return GiftCardResponseM(
-      statusCode: 'ERROR',
+      statusCode: statusCode ?? 'ERROR',
       message: msg,
       status: 404,
       data: [],
@@ -105,9 +105,9 @@ class GiftCardRateResM {
     );
   }
 
-  factory GiftCardRateResM.error(String msg) {
+  factory GiftCardRateResM.error(String msg, {String? statusCode}) {
     return GiftCardRateResM(
-      statusCode: "FAILED",
+      statusCode: statusCode ?? "FAILED",
       message: msg,
       status: 404,
       data: [],

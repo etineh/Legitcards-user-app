@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:legit_cards/constants/app_colors.dart';
 import 'package:legit_cards/extension/inbuilt_ext.dart';
+import 'package:legit_cards/screens/widgets/app_bar.dart';
 import 'package:legit_cards/screens/widgets/custom_text.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:provider/provider.dart';
@@ -59,11 +60,11 @@ class _OtpScreenState extends State<OtpScreen> {
 
   // verify code
   Future<void> _verifyOtp(String code, AuthViewModel authVM) async {
-    final request = ActivateAccountRequest(email: user.email, code: code);
+    final request =
+        ActivateAccountRequest(email: user.email, code: code.toUpperCase());
 
     try {
       final response = await authVM.activateAccount(request);
-      // print("General log: what is user activate response $response");
 
       final String? userId = response.data?.isNotEmpty == true
           ? response.data!.first.userid
@@ -77,6 +78,7 @@ class _OtpScreenState extends State<OtpScreen> {
       authVM.setIsLoadingToTrue();
 
       user.updateUserM.userid = userId; // add userid to user profile
+
       await authVM.updateNewUserProfile(user.updateUserM);
 
       if (mounted) authVM.loginUser(user.signIn, context);
@@ -112,78 +114,69 @@ class _OtpScreenState extends State<OtpScreen> {
 
     return Scaffold(
       backgroundColor: context.backgroundColor,
-      appBar: AppBar(
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () {
-              context.goBack();
-            },
-          ),
-          title: const Text(
-            "Verification",
-            style: TextStyle(color: Colors.white),
-          ),
-          centerTitle: true,
-          backgroundColor: AppColors.primaryPurple),
+      appBar: const CustomAppBar(title: 'Verification'),
       body: ModalProgressHUD(
         inAsyncCall: authViewModel.isLoading,
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const SizedBox(height: 20),
+        child: GestureDetector(
+          onTap: context.hideKeyboard,
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const SizedBox(height: 20),
 
-                const Icon(
-                  Icons.verified_user,
-                  size: 80,
-                  color: AppColors.lightPurple,
-                ),
-
-                const SizedBox(height: 20),
-                Text(
-                  "Enter the 6-digit code sent to your email ",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 16, color: context.blackWhite),
-                ),
-
-                const SizedBox(height: 20),
-
-                // OTP Input
-                CodeField(
-                  onCompleted: (code) {
-                    _verifyOtp(code, authViewModel);
-                  },
-                ),
-                CustomText(
-                  size: 12,
-                  color: context.purpleText,
-                  text:
-                      "Please check your spam folder if not received in your inbox",
-                ),
-
-                const SizedBox(height: 30),
-
-                // Countdown + Resend
-                _canResend
-                    ? TextButton(
-                        onPressed: () => _resendOtp(authViewModel),
-                        child: const Text("Resend OTP"),
-                      )
-                    : Text("Resend in $_remainingSeconds s",
-                        style: const TextStyle(color: Colors.grey)),
-
-                // Show Support Section
-                if (_showSupport) ...[
-                  const SizedBox(height: 50),
-                  const Divider(color: Colors.grey),
-                  const SelectableText(
-                    "Any issue? Contact support: \nCall: 0806 051 7997 \nEmail: support@legitcards.com.ng",
-                    style: TextStyle(color: Colors.grey),
+                  const Icon(
+                    Icons.verified_user,
+                    size: 80,
+                    color: AppColors.lightPurple,
                   ),
+
+                  const SizedBox(height: 20),
+                  Text(
+                    "Enter the 6-digit code sent to your email ",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 16, color: context.blackWhite),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  // OTP Input
+                  CodeField(
+                    onCompleted: (code) {
+                      _verifyOtp(code, authViewModel);
+                    },
+                  ),
+                  CustomText(
+                    size: 12,
+                    color: context.purpleText,
+                    text:
+                        "Please check your spam folder if not received in your inbox",
+                  ),
+
+                  const SizedBox(height: 30),
+
+                  // Countdown + Resend
+                  _canResend
+                      ? TextButton(
+                          onPressed: () => _resendOtp(authViewModel),
+                          child: const Text("Resend OTP"),
+                        )
+                      : Text("Resend in $_remainingSeconds s",
+                          style: const TextStyle(color: Colors.grey)),
+
+                  // Show Support Section
+                  if (_showSupport) ...[
+                    const SizedBox(height: 50),
+                    const Divider(color: Colors.grey),
+                    const SelectableText(
+                      "Any issue? Contact support: \nCall: 0806 051 7997 \nEmail: support@legitcards.com.ng",
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                  ],
                 ],
-              ],
+              ),
             ),
           ),
         ),

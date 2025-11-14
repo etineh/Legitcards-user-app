@@ -52,8 +52,8 @@ class K {
   static const CARD = "CARD";
   static const COIN = "CRYPTO";
 
-  static const VERSION_NAME = "1.26.0";
-  static const VERSION_CODE = "16015";
+  static const VERSION_NAME = "1.27.0";
+  static const VERSION_CODE = "16016";
 
   static bool isAndroid() {
     return Platform.isAndroid;

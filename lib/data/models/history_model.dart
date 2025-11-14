@@ -23,9 +23,9 @@ class HistoryResponseM {
     );
   }
 
-  factory HistoryResponseM.error(String msg) {
+  factory HistoryResponseM.error(String msg, String? statusCode) {
     return HistoryResponseM(
-      statusCode: 'ERROR',
+      statusCode: statusCode ?? 'ERROR',
       message: msg,
       status: 404,
       data: [],

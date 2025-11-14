@@ -193,9 +193,9 @@ class ApiResponseM {
     );
   }
 
-  factory ApiResponseM.error(String msg) {
+  factory ApiResponseM.error(String msg, {String? statusCode = 'Failed'}) {
     return ApiResponseM(
-      statusCode: "Failed",
+      statusCode: statusCode ?? 'Failed',
       status: 404,
       message: msg,
       data: [],

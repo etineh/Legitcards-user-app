@@ -8,7 +8,7 @@ class AuthApi {
   static final String baseUrl = K.baseUrl;
   // static String baseUrl = "http://172.20.10.2:7000";
 
-  // create account
+  // create account - Sign Up
   Future<ApiResponseM> createUser(SignModel user) async {
     final url = Uri.parse("$baseUrl/api/auth/users/create");
 
@@ -110,7 +110,7 @@ class AuthApi {
     if (response.statusCode == 200 || response.statusCode == 201) {
       return model;
     } else {
-      throw Exception(model.message);
+      throw {"message": model.message, "statusCode": model.statusCode};
     }
   }
 

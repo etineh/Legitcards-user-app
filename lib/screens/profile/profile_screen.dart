@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:legit_cards/Utilities/cache_utils.dart';
 import 'package:legit_cards/constants/k.dart';
@@ -7,6 +9,7 @@ import 'package:legit_cards/extension/inbuilt_ext.dart';
 import 'package:legit_cards/screens/profile/profile_view_model.dart';
 import 'package:legit_cards/screens/widgets/PrimaryButton.dart';
 import 'package:legit_cards/screens/widgets/app_bar.dart';
+import 'package:legit_cards/services/firebase_messaging_service.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:provider/provider.dart';
 
@@ -25,7 +28,8 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> with RouteAware {
   late UserProfileM user;
   bool _is2FAEnabled = false;
-  // List<BankAccount> bankAccounts = CacheUtils.myBankAccount;
+  bool _notificationsEnabled = false;
+  final _messagingService = FirebaseMessagingService();
 
   @override
   void initState() {
@@ -35,11 +39,21 @@ class _ProfileScreenState extends State<ProfileScreen> with RouteAware {
       _is2FAEnabled = user.is2fa ?? false;
     });
 
+    // Check current notification permission status
+    _checkNotificationPermission();
+
     if (CacheUtils.myBankAccount.isEmpty) {
       ProfileViewModel viewModel =
           Provider.of<ProfileViewModel>(context, listen: false);
       viewModel.getMyBankInfo(user);
     }
+  }
+
+  Future<void> _checkNotificationPermission() async {
+    final isGranted = await _messagingService.isPermissionGranted();
+    setState(() {
+      _notificationsEnabled = isGranted;
+    });
   }
 
   @override
@@ -84,6 +98,41 @@ class _ProfileScreenState extends State<ProfileScreen> with RouteAware {
     if (sendRes.statusCode == "2FA_DISABLED") {
       setState(() {
         _is2FAEnabled = false;
+      });
+    }
+  }
+
+  Future<void> _handleNotificationToggle(bool enabled) async {
+    if (enabled) {
+      // Request notification permission
+      final granted = await _messagingService.requestPermission();
+
+      if (!mounted) return;
+
+      if (granted) {
+        setState(() {
+          _notificationsEnabled = true;
+        });
+        context.toastMsg('Notifications enabled successfully');
+      } else {
+        setState(() {
+          _notificationsEnabled = false;
+        });
+        context.toastMsg(
+            'Notification permission denied. Please enable in Settings.');
+      }
+    } else {
+      // User wants to disable - inform them to do it in system settings
+      if (!mounted) return;
+      context.showInfoDialog(
+        title: 'Disable Notifications',
+        subtitle:
+            'To disable notifications, please go to your device Settings > Legitcards > Notifications and turn them off.',
+      );
+
+      // Revert the switch
+      setState(() {
+        _notificationsEnabled = true;
       });
     }
   }
@@ -158,9 +207,20 @@ class _ProfileScreenState extends State<ProfileScreen> with RouteAware {
 
               const SizedBox(height: 10),
 
+              // Push Notifications Toggle
+              _settingsToggle(
+                title: 'Push Notifications',
+                subtitle: 'Receive updates about your transactions',
+                value: _notificationsEnabled,
+                onChanged: _handleNotificationToggle,
+              ),
+
+              const SizedBox(height: 10),
+
               // 2FA
-              _twoFA(
+              _settingsToggle(
                 title: '2FA',
+                subtitle: 'Two-factor authentication',
                 value: _is2FAEnabled,
                 onChanged: (enabled) {
                   if (_is2FAEnabled) {
@@ -232,15 +292,16 @@ class _ProfileScreenState extends State<ProfileScreen> with RouteAware {
               const SizedBox(height: 32),
 
               // Version
-              Center(
-                child: Text(
-                  'Version ${K.VERSION_NAME} (${K.VERSION_CODE})',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[500],
+              if (Platform.isAndroid)
+                Center(
+                  child: Text(
+                    'Version ${K.VERSION_NAME} (${K.VERSION_CODE})',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[500],
+                    ),
                   ),
                 ),
-              ),
 
               const SizedBox(height: 24),
             ],
@@ -333,13 +394,14 @@ class _ProfileScreenState extends State<ProfileScreen> with RouteAware {
     );
   }
 
-  Widget _twoFA({
+  Widget _settingsToggle({
     required String title,
+    String? subtitle,
     required bool value,
     required ValueChanged<bool> onChanged,
   }) {
     return Container(
-      padding: const EdgeInsets.all(10),
+      padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
         color: context.cardColor,
         borderRadius: BorderRadius.circular(12),
@@ -348,12 +410,29 @@ class _ProfileScreenState extends State<ProfileScreen> with RouteAware {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-              color: context.blackWhite,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: context.blackWhite,
+                  ),
+                ),
+                if (subtitle != null) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
+              ],
             ),
           ),
           Switch(

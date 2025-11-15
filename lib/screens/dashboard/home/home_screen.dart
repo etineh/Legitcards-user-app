@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:legit_cards/Utilities/adjust_utils.dart';
@@ -252,14 +254,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 // border: Border.all(
                 //     color: AppColors.primaryPurple, width: 2),
               ),
-              child: const Column(
+              child: Column(
                 children: [
-                  Icon(Icons.card_giftcard, color: Colors.white, size: 40),
-                  SizedBox(height: 10),
+                  const Icon(Icons.card_giftcard,
+                      color: Colors.white, size: 40),
+                  const SizedBox(height: 10),
                   Text(
-                    "Sell your\nGiftcards",
+                    Platform.isIOS
+                        ? "Exchange\nGiftcards"
+                        : "Sell your\nGiftcards",
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,

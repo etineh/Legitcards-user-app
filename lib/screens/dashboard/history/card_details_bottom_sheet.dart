@@ -77,12 +77,12 @@ class CardDetailBottomSheet extends StatelessWidget {
                   const SizedBox(height: 24),
 
                   // Cancel button (only show for pending transactions)
-                  if (transaction.status.toLowerCase() == 'pending' ||
-                      transaction.status.toLowerCase() == 'selling')
+                  if (AdjustUtils.statusWithCancelOption(transaction))
                     _buildButton(context),
 
                   const SizedBox(height: 20),
-                  if (transaction.status.toLowerCase() == "selling")
+                  if (transaction.status.toLowerCase() == "selling" ||
+                      transaction.status.toLowerCase() == "exchanging")
                     CustomText(
                       text: "Cancel",
                       onTap: () {
@@ -246,10 +246,13 @@ class CardDetailBottomSheet extends StatelessWidget {
           _buildDetailRow('Quantity', '${transaction.quantity}'),
           if (transaction.status != "PENDING" &&
               transaction.status != "CANCELLED" &&
-              transaction.status != "SELLING")
+              transaction.status != "SELLING" &&
+              transaction.status != "EXCHANGING")
             _buildDetailRow('Feedback', transaction.feedbacks.join("\n")),
 
-          if (transaction.status != "SELLING") _buildTransactionId(context),
+          if (transaction.status != "SELLING" &&
+              transaction.status != "EXCHANGING")
+            _buildTransactionId(context),
 
           const SizedBox(height: 12),
 

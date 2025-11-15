@@ -270,7 +270,11 @@ class _CoinScreenState extends State<CoinScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        const CustomText(text: "Select Coin to sell", size: 14),
+        CustomText(
+            text: Platform.isIOS
+                ? "Select Coin to exchange"
+                : "Select Coin to sell",
+            size: 14),
         const SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(

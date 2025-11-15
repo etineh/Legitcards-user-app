@@ -250,40 +250,40 @@ class _GiftCardScreenState extends State<GiftCardScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: TextField(
-            controller: _searchController,
-            style: TextStyle(color: context.blackWhite),
-            onChanged: (value) {
-              setState(() {
-                _searchQuery = value.toLowerCase();
-              });
-            },
-            decoration: InputDecoration(
-              hintText: 'Search',
-              hintStyle: TextStyle(color: Colors.grey[500]),
-              prefixIcon: const Icon(Icons.search, color: Colors.grey),
-              enabledBorder: OutlineInputBorder(
-                // 👈 default (unfocused) border
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.grey[500]!),
-              ),
-              focusedBorder: OutlineInputBorder(
-                // 👈 when user taps (focused)
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: context.purpleText, width: 2),
+              controller: _searchController,
+              style: TextStyle(color: context.blackWhite),
+              onChanged: (value) {
+                setState(() {
+                  _searchQuery = value.toLowerCase();
+                });
+              },
+              decoration: InputDecoration(
+                hintText: 'Search',
+                hintStyle: TextStyle(color: Colors.grey[500]),
+                prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                enabledBorder: OutlineInputBorder(
+                  // 👈 default (unfocused) border
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Colors.grey[500]!),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  // 👈 when user taps (focused)
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: context.purpleText, width: 2),
+                ),
               ),
             ),
           ),
-        ),
-        const SizedBox(height: 16),
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15.0),
-            child: _build2GridCardList(viewModel),
+          const SizedBox(height: 16),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15.0),
+              child: _build2GridCardList(viewModel),
+            ),
           ),
-        ),
-        const SizedBox(height: 5),
-      ],
-    ),
+          const SizedBox(height: 5),
+        ],
+      ),
     );
   }
 
@@ -297,50 +297,50 @@ class _GiftCardScreenState extends State<GiftCardScreen> {
           onTap: () => context.hideKeyboard(),
           child: SingleChildScrollView(
             child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              // Header with balance
-              const CustomText(text: "Get funded in few minutes! ☺️"),
-              const SizedBox(height: 20),
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Header with balance
+                const CustomText(text: "Get funded in few minutes! ☺️"),
+                const SizedBox(height: 20),
 
-              // Gift Card Category selection
-              _buildGiftCardSelector(giftCardVM),
-              const SizedBox(height: 12),
+                // Gift Card Category selection
+                _buildGiftCardSelector(giftCardVM),
+                const SizedBox(height: 12),
 
-              // Sub-category selection
-              _buildCountrySelector(giftCardVM),
-              const SizedBox(height: 12),
+                // Sub-category selection
+                _buildCountrySelector(giftCardVM),
+                const SizedBox(height: 12),
 
-              // Sub-category selection
-              _buildAssetTypeSelector(giftCardVM),
-              const SizedBox(height: 12),
+                // Sub-category selection
+                _buildAssetTypeSelector(giftCardVM),
+                const SizedBox(height: 12),
 
-              // Amount input
-              _buildAmountInput(),
-              const SizedBox(height: 12),
+                // Amount input
+                _buildAmountInput(),
+                const SizedBox(height: 12),
 
-              // Quantity
-              _buildQuantity(),
-              const SizedBox(height: 12),
+                // Quantity
+                _buildQuantity(),
+                const SizedBox(height: 12),
 
-              // Rate display
-              _buildRateDisplay(),
-              const SizedBox(height: 20),
+                // Rate display
+                _buildRateDisplay(),
+                const SizedBox(height: 20),
 
-              // require number of images
-              _imageInfo(),
-              const SizedBox(height: 15),
+                // require number of images
+                _imageInfo(),
+                const SizedBox(height: 15),
 
-              // Upload images section
-              _buildImageUploadSection(),
-              const SizedBox(height: 30),
+                // Upload images section
+                _buildImageUploadSection(),
+                const SizedBox(height: 30),
 
-              // Proceed button
-              _buildProceedButton(),
-            ],
+                // Proceed button
+                _buildProceedButton(),
+              ],
+            ),
           ),
         ),
-      ),
       ),
     );
   }
@@ -480,7 +480,7 @@ class _GiftCardScreenState extends State<GiftCardScreen> {
               selectedType ?? 'Select Card Type',
               style: TextStyle(
                 fontSize: 16,
-                color: selectedCountry != null
+                color: selectedType != null
                     ? context.blackWhite
                     : Colors.grey[600],
               ),
@@ -811,63 +811,64 @@ class _GiftCardScreenState extends State<GiftCardScreen> {
                     const BorderRadius.vertical(top: Radius.circular(20)),
               ),
               child: Column(
-              children: [
-                const SizedBox(height: 12),
-                // drag handle
-                Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(2),
+                children: [
+                  const SizedBox(height: 12),
+                  // drag handle
+                  Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      borderRadius: BorderRadius.circular(2),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 20),
+                  const SizedBox(height: 20),
 
-                const CustomText(
-                  text: "Select Gift Card Asset",
-                  shouldBold: true,
-                  size: 20,
-                ),
+                  const CustomText(
+                    text: "Select Gift Card Asset",
+                    shouldBold: true,
+                    size: 20,
+                  ),
 
-                const SizedBox(height: 20),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: TextField(
-                    controller: _searchController,
-                    style: TextStyle(color: context.blackWhite),
-                    onChanged: (value) {
-                      setModalState(() {
-                        _searchQuery = value.toLowerCase();
-                      });
-                    },
-                    decoration: InputDecoration(
-                      hintText: 'Search',
-                      hintStyle: TextStyle(color: Colors.grey[500]),
-                      prefixIcon: const Icon(Icons.search, color: Colors.grey),
-                      enabledBorder: OutlineInputBorder(
-                        // 👈 default (unfocused) border
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: Colors.grey[500]!),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        // 👈 when user taps (focused)
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide:
-                            BorderSide(color: context.purpleText, width: 2),
+                  const SizedBox(height: 20),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: TextField(
+                      controller: _searchController,
+                      style: TextStyle(color: context.blackWhite),
+                      onChanged: (value) {
+                        setModalState(() {
+                          _searchQuery = value.toLowerCase();
+                        });
+                      },
+                      decoration: InputDecoration(
+                        hintText: 'Search',
+                        hintStyle: TextStyle(color: Colors.grey[500]),
+                        prefixIcon:
+                            const Icon(Icons.search, color: Colors.grey),
+                        enabledBorder: OutlineInputBorder(
+                          // 👈 default (unfocused) border
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: Colors.grey[500]!),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          // 👈 when user taps (focused)
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide:
+                              BorderSide(color: context.purpleText, width: 2),
+                        ),
                       ),
                     ),
                   ),
-                ),
 
-                const SizedBox(height: 16),
+                  const SizedBox(height: 16),
 
-                Expanded(
-                  child: _buildGiftCardList(viewModel),
-                ),
-              ],
+                  Expanded(
+                    child: _buildGiftCardList(viewModel),
+                  ),
+                ],
+              ),
             ),
-          ),
           );
         },
       ),
@@ -1210,7 +1211,7 @@ class _GiftCardScreenState extends State<GiftCardScreen> {
       assetImage: selectedCardAsset!.images,
       assetId: selectedCardAsset!.id,
       images: uploadedUrls, // user will upload later
-      status: 'SELLING',
+      status: Platform.isIOS ? 'EXCHANGING' : 'SELLING',
       createdAt: DateTime.now().millisecondsSinceEpoch,
       country: selectedRate!.country,
       type: selectedRate!.type,
@@ -1252,10 +1253,6 @@ class _GiftCardScreenState extends State<GiftCardScreen> {
     }
     uploadedUrls.clear();
     // load image to cloud
-    // uploadedUrls = [
-    //   "https://res.cloudinary.com/dhvucxi2s/image/upload/v1759693124/legitcards/vaviup5noeeu0m38bujt.jpg",
-    //   "https://res.cloudinary.com/dhvucxi2s/image/upload/v1759693125/legitcards/t1sghlug7yup6at5kjk1.jpg"
-    // ];
     try {
       for (final file in uploadedImages) {
         final uploadedUrl = await CloudinaryUtils.uploadImage(file);

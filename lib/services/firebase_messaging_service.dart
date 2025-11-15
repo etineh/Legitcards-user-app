@@ -87,14 +87,14 @@ class FirebaseMessagingService {
   Stream<Map<String, dynamic>> get notificationTapStream =>
       _notificationTapStream.stream;
 
-  // Initialize Firebase Messaging
+  // Initialize Firebase Messaging WITHOUT requesting permission
   Future<void> initialize() async {
     try {
       // Initialize awesome notifications
       await _initializeAwesomeNotifications();
 
-      // Request permission
-      await requestPermission();
+      // DO NOT request permission automatically - wait for user opt-in
+      // This ensures compliance with Apple's App Store guidelines 4.5.4
 
       // Setup message handlers
       _setupMessageHandlers();
@@ -108,6 +108,18 @@ class FirebaseMessagingService {
       if (kDebugMode) {
         print('General log: Error initializing Firebase Messaging: $e');
       }
+    }
+  }
+
+  // Check if notification permissions are already granted
+  Future<bool> isPermissionGranted() async {
+    try {
+      final settings = await _firebaseMessaging.getNotificationSettings();
+      return settings.authorizationStatus == AuthorizationStatus.authorized ||
+          settings.authorizationStatus == AuthorizationStatus.provisional;
+    } catch (e) {
+      print('Error checking permission status: $e');
+      return false;
     }
   }
 
@@ -154,6 +166,8 @@ class FirebaseMessagingService {
   }
 
   // Request notification permission
+  // IMPORTANT: Only call this when user explicitly opts-in to notifications
+  // (e.g., from Settings screen or onboarding prompt)
   Future<bool> requestPermission() async {
     try {
       // Firebase messaging permission
@@ -167,7 +181,14 @@ class FirebaseMessagingService {
       // Awesome notifications permission
       await AwesomeNotifications().requestPermissionToSendNotifications();
 
-      return settings.authorizationStatus == AuthorizationStatus.authorized;
+      final isGranted = settings.authorizationStatus == AuthorizationStatus.authorized;
+
+      if (isGranted) {
+        // Only get token after permission is granted
+        await getDeviceToken();
+      }
+
+      return isGranted;
     } catch (e) {
       print('Error requesting permission: $e');
       return false;
@@ -175,8 +196,16 @@ class FirebaseMessagingService {
   }
 
   // Get device token
+  // Only returns token if user has granted permission
   Future<String?> getDeviceToken() async {
     try {
+      // Check if permission is granted before getting token
+      final hasPermission = await isPermissionGranted();
+      if (!hasPermission) {
+        // User hasn't granted permission, don't get token
+        return null;
+      }
+
       _deviceToken = await _firebaseMessaging.getToken();
       // print('General log: Device Token: $_deviceToken');
 
@@ -185,7 +214,7 @@ class FirebaseMessagingService {
         _deviceToken = newToken;
         print('Token refreshed: $newToken');
       });
-// e2dK-VcCSUSOFSujrxtWdb:APA91bFy_OP3vFxEAWAvMKhkXPbf3eZBMJFJdB3BZxf-d4ZaZcah0QAu3-SFsWsYw2giKYD8BMQ2AhvKbQ7RiSmp2dLtNAgry1BQWxQV0hQgwEQ8oniH9Js
+
       return _deviceToken;
     } catch (e) {
       print('Error getting device token: $e');

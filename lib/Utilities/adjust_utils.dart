@@ -7,6 +7,8 @@ import 'package:legit_cards/constants/app_colors.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 
+import '../data/models/history_model.dart';
+
 class AdjustUtils {
   static String normalizePhone(String phone) {
     phone = phone.trim();
@@ -113,6 +115,7 @@ class AdjustUtils {
       case 'pending':
         return Colors.orange;
       case 'selling':
+      case 'exchanging':
         return AppColors.primaryPurple;
       case 'completed':
       case 'success':
@@ -172,5 +175,11 @@ class AdjustUtils {
     }
 
     return userid; // Return as-is if can't extract
+  }
+
+  static bool statusWithCancelOption(GiftCardTradeM transaction) {
+    return (transaction.status.toLowerCase() == 'pending' ||
+        transaction.status.toLowerCase() == 'selling' ||
+        transaction.status.toLowerCase() == 'exchanging');
   }
 }

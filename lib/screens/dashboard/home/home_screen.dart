@@ -10,6 +10,7 @@ import 'package:legit_cards/screens/notification/notification_view_model.dart';
 import 'package:legit_cards/screens/wallet/wallet_view_model.dart';
 import 'package:legit_cards/screens/widgets/custom_text.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../constants/k.dart';
 import '../../../data/models/gift_card_trades_m.dart';
@@ -48,11 +49,27 @@ class _HomeScreenState extends State<HomeScreen> {
     userProfileM = widget.userProfileM;
     onTabChange = widget.onTabChange;
     onCardSelected = widget.onCardSelected;
+    _loadBalanceVisibility();
     fetchCryptoRates();
     fetchBalance();
     refreshPushToken();
 
     super.initState();
+  }
+
+  Future<void> _loadBalanceVisibility() async {
+    final prefs = await SharedPreferences.getInstance();
+    final isVisible = prefs.getBool('balance_visibility') ?? true;
+    if (mounted) {
+      setState(() {
+        _isBalanceVisible = isVisible;
+      });
+    }
+  }
+
+  Future<void> _saveBalanceVisibility(bool isVisible) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('balance_visibility', isVisible);
   }
 
   Future<void> refreshPushToken() async {
@@ -83,7 +100,162 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         notificationIsUnread = isUnread;
       });
+
+      // Check and show notification reminder if needed
+      await _checkAndShowNotificationReminder();
     });
+  }
+
+  Future<void> _checkAndShowNotificationReminder() async {
+    final messagingService = FirebaseMessagingService();
+    final hasPermission = await messagingService.isPermissionGranted();
+
+    // Show reminder if notifications are not enabled
+    if (!hasPermission && mounted) {
+      // Check if 72 hours have passed since last shown
+      final prefs = await SharedPreferences.getInstance();
+      final lastShown = prefs.getInt('notification_reminder_last_shown') ?? 0;
+      final currentTime = DateTime.now().millisecondsSinceEpoch;
+      final hoursSinceLastShown = (currentTime - lastShown) / (1000 * 60 * 60);
+
+      // Show only if 72 hours have passed or never shown before
+      if (hoursSinceLastShown >= 72 || lastShown == 0) {
+        // Add a small delay to ensure home screen is fully loaded
+        await Future.delayed(const Duration(milliseconds: 500));
+        if (mounted) {
+          _showNotificationReminderSheet();
+          // Save the current timestamp
+          await prefs.setInt('notification_reminder_last_shown', currentTime);
+        }
+      }
+    }
+  }
+
+  void _showNotificationReminderSheet() {
+    showModalBottomSheet(
+      context: context,
+      isDismissible: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: BoxDecoration(
+          color: context.backgroundColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Drag handle
+            Container(
+              width: 40,
+              height: 4,
+              margin: const EdgeInsets.only(bottom: 20),
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+
+            // Icon
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: context.purpleText.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.notifications_active,
+                size: 48,
+                color: context.purpleText,
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            // Title
+            CustomText(
+              text: "Stay Updated!",
+              shouldBold: true,
+              size: 22,
+              color: context.blackWhite,
+            ),
+
+            const SizedBox(height: 12),
+
+            // Message
+            CustomText(
+              text:
+                  "Don't miss out on important updates about your gift card transactions, rates, and special offers!",
+              size: 14,
+              color: context.defaultColor,
+              // textAlign: TextAlign.center,
+            ),
+
+            const SizedBox(height: 30),
+
+            // Activate Now button
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () async {
+                  Navigator.pop(context);
+                  final messagingService = FirebaseMessagingService();
+                  final granted = await messagingService.requestPermission();
+
+                  if (granted) {
+                    if (context.mounted) {
+                      context.toastMsg('Notifications enabled successfully!');
+                    }
+                  } else {
+                    if (context.mounted) {
+                      context
+                          .toastMsg('Please enable notifications in Settings');
+                    }
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.lightPurple,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: const Text(
+                  'Activate Now',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 12),
+
+            // Later button
+            SizedBox(
+              width: double.infinity,
+              child: TextButton(
+                onPressed: () => Navigator.pop(context),
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                ),
+                child: Text(
+                  'Maybe Later',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: context.defaultColor,
+                  ),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
   }
 
   Future<void> _refreshBalance() async {
@@ -260,9 +432,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       color: Colors.white, size: 40),
                   const SizedBox(height: 10),
                   Text(
-                    Platform.isIOS
-                        ? "Exchange\nGiftcards"
-                        : "Sell your\nGiftcards",
+                    Platform.isIOS ? "Giftcards\n" : "Sell your\nGiftcards",
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                       color: Colors.white,
@@ -281,7 +451,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: InkWell(
             onTap: () {
               // Navigate to trade coins
-              onTabChange?.call(2);
+              Platform.isIOS ? onTabChange?.call(1) : onTabChange?.call(2);
             },
             child: Container(
               padding: const EdgeInsets.all(20),
@@ -293,11 +463,15 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               child: Column(
                 children: [
-                  const Icon(Icons.currency_bitcoin,
-                      color: Colors.orange, size: 40),
+                  Icon(
+                      Platform.isIOS
+                          ? Icons.rate_review
+                          : Icons.currency_bitcoin,
+                      color: Colors.orange,
+                      size: 40),
                   const SizedBox(height: 10),
                   Text(
-                    "Trade your\nCoins",
+                    Platform.isIOS ? "Rate\nCalculator" : "Trade your\nCoins",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: context.purpleText,
@@ -347,9 +521,11 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 InkWell(
                   onTap: () {
+                    final newValue = !_isBalanceVisible;
                     setState(() {
-                      _isBalanceVisible = !_isBalanceVisible;
+                      _isBalanceVisible = newValue;
                     });
+                    _saveBalanceVisibility(newValue);
                   },
                   child: Row(
                     children: [
@@ -482,22 +658,49 @@ class _HomeScreenState extends State<HomeScreen> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: ListTile(
-                    leading: Container(
-                      width: 60,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      clipBehavior: Clip.antiAlias,
-                      child: CachedNetworkImage(
-                        imageUrl: category.images[0],
-                        fit: BoxFit.cover,
-                        placeholder: (context, url) => const Center(
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        ),
-                        errorWidget: (context, url, error) =>
-                            const Icon(Icons.error, color: Colors.red),
-                      ),
-                    ),
+                    leading: Platform.isAndroid
+                        ? Container(
+                            width: 60,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            clipBehavior: Clip.antiAlias,
+                            child: CachedNetworkImage(
+                              imageUrl: category.images[0],
+                              fit: BoxFit.cover,
+                              placeholder: (context, url) => const Center(
+                                child:
+                                    CircularProgressIndicator(strokeWidth: 2),
+                              ),
+                              errorWidget: (context, url, error) =>
+                                  const Icon(Icons.error, color: Colors.red),
+                            ),
+                          )
+                        : Container(
+                            width: 40,
+                            height: 40,
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: LinearGradient(
+                                colors: [
+                                  Color(0xFFBF2882), // light purple
+                                  Color(0xFF5B2C98), // deep indigo
+                                ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                            ),
+                            child: Center(
+                              child: Text(
+                                AdjustUtils.getCardAbbreviation(category.name),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
                     title: CustomText(text: category.name, shouldBold: true),
                     onTap: () {
                       // open the card screen

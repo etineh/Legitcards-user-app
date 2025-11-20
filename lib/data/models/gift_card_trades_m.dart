@@ -126,8 +126,9 @@ class GiftCardRateM {
   final double to;
   final double rate;
   final String processingTime;
-  final String tradingPeriodStart;
-  final String tradingPeriodStop;
+  final bool cardActive;
+  final bool rateActive;
+  final String? fixRange;
   final String note;
   final String admin;
   final GiftCardAssetM? asset;
@@ -143,8 +144,9 @@ class GiftCardRateM {
     required this.to,
     required this.rate,
     required this.processingTime,
-    required this.tradingPeriodStart,
-    required this.tradingPeriodStop,
+    this.cardActive = true,
+    this.rateActive = true,
+    this.fixRange,
     required this.note,
     required this.admin,
     this.asset,
@@ -164,8 +166,9 @@ class GiftCardRateM {
       to: (json['to'] ?? 0).toDouble(),
       rate: (json['rate'] ?? 0).toDouble(),
       processingTime: json['processing_time'] ?? '',
-      tradingPeriodStart: json['trading_period_start'] ?? '',
-      tradingPeriodStop: json['trading_period_stop'] ?? '',
+      cardActive: json['cardActive'] ?? true,
+      rateActive: json['rateActive'] ?? true,
+      fixRange: json['fixRange'],
       note: json['note'] ?? '',
       admin: json['admin'] ?? '',
       asset:

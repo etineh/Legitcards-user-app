@@ -43,7 +43,7 @@ class _Enable2FaScreenState extends State<Enable2FaScreen> {
       var payload = {
         "type": "email",
         "id": user.userid,
-        "code": code,
+        "code": code.toUpperCase(),
       };
 
       final profileR = await profileVM.enable2Fa(payload, user.token!);

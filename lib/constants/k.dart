@@ -3,7 +3,7 @@ import 'dart:io';
 class K {
   static String baseUrl = "https://legitcards-api.onrender.com";
   // static String baseUrl = "https://legitcards.ng";
-// static String baseUrl = "http://192.168.0.171:8080";
+  // static String baseUrl = "http://172.20.10.2:7000";
 
   static const dashboardScreen = "/";
   static const welcomeScreenPath = "/welcome";
@@ -52,8 +52,8 @@ class K {
   static const CARD = "CARD";
   static const COIN = "CRYPTO";
 
-  static const VERSION_NAME = "1.27.0";
-  static const VERSION_CODE = "16016";
+  static const VERSION_CODE = "16017";
+  static const VERSION_NAME = "1.28.0";
 
   static bool isAndroid() {
     return Platform.isAndroid;

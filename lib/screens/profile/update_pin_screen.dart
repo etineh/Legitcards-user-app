@@ -70,7 +70,7 @@ class _UpdatePinScreenState extends State<UpdatePinScreen> {
 
     try {
       final payload = {
-        "token": _codeController.text,
+        "token": _codeController.text.toUpperCase(),
         "id": user.userid,
         "pin": pin,
       };

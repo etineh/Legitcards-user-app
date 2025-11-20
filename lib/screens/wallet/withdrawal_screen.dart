@@ -118,60 +118,61 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                   borderRadius:
                       const BorderRadius.vertical(top: Radius.circular(20)),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
                 child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Drag handle
-                  Container(
-                    width: 40,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade300,
-                      borderRadius: BorderRadius.circular(2),
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Drag handle
+                    Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade300,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 20),
+                    const SizedBox(height: 20),
 
-                  // Title
-                  const CustomText(
-                    text: "Enter PIN",
-                    size: 20,
-                    shouldBold: true,
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Pin Field
-                  CodeField(
-                    onCompleted: (code) {
-                      Navigator.pop(context);
-                      context.hideKeyboard();
-                      _submitWithdrawal(amount, code);
-                    },
-                    length: 4,
-                    keyboardType: TextInputType.number,
-                    onChanged: (code) {
-                      // pin = code;
-                    },
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Cancel button
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      context.hideKeyboard();
-                    },
-                    child: const Text(
-                      "Cancel",
-                      style: TextStyle(color: Colors.grey),
+                    // Title
+                    const CustomText(
+                      text: "Enter PIN",
+                      size: 20,
+                      shouldBold: true,
                     ),
-                  ),
-                  const SizedBox(height: 10),
-                ],
+                    const SizedBox(height: 20),
+
+                    // Pin Field
+                    CodeField(
+                      onCompleted: (code) {
+                        Navigator.pop(context);
+                        context.hideKeyboard();
+                        _submitWithdrawal(amount, code);
+                      },
+                      length: 4,
+                      keyboardType: TextInputType.number,
+                      onChanged: (code) {
+                        // pin = code;
+                      },
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Cancel button
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        context.hideKeyboard();
+                      },
+                      child: const Text(
+                        "Cancel",
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                  ],
+                ),
               ),
             ),
-          ),
           ),
         );
       },
@@ -190,7 +191,7 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
       "user_id": userProfileM.userid,
       "pin": pin,
       "id": userProfileM.userid,
-      "version": K.VERSION_NAME,
+      "version": K.VERSION_CODE,
     };
 
     WalletViewModel walletVM =
@@ -241,32 +242,33 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
               constraints: BoxConstraints(
                 minHeight: MediaQuery.of(context).size.height -
                     MediaQuery.of(context).padding.top -
-                    kToolbarHeight - 32, // 32 is the padding (16 top + 16 bottom)
+                    kToolbarHeight -
+                    32, // 32 is the padding (16 top + 16 bottom)
               ),
               child: Column(
                 children: [
-              // Amount Input
-              _buildAmountInput(walletVM),
-              const SizedBox(height: 16),
+                  // Amount Input
+                  _buildAmountInput(walletVM),
+                  const SizedBox(height: 16),
 
-              // Select Bank Account
-              _buildBankSelection(),
-              const SizedBox(height: 24),
+                  // Select Bank Account
+                  _buildBankSelection(),
+                  const SizedBox(height: 24),
 
-              // Transaction Summary (shown when amount is entered)
-              if (!_isAmountInvalid) ...[
-                _buildTradeSummaryOnInputAmount(amount),
-                const SizedBox(height: 24),
-              ],
+                  // Transaction Summary (shown when amount is entered)
+                  if (!_isAmountInvalid) ...[
+                    _buildTradeSummaryOnInputAmount(amount),
+                    const SizedBox(height: 24),
+                  ],
 
-              // Withdraw Button
-              const SizedBox(height: 24),
-              _buildProceedButton(walletVM)
-            ],
+                  // Withdraw Button
+                  const SizedBox(height: 24),
+                  _buildProceedButton(walletVM)
+                ],
+              ),
+            ),
           ),
         ),
-        ),
-      ),
       ),
     );
   }
@@ -444,71 +446,71 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
         ),
         padding: const EdgeInsets.all(24),
         child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Drag handle
-          Container(
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: Colors.grey.shade300,
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          const SizedBox(height: 20),
-
-          // Title
-          const CustomText(
-            text: "Select Bank Account",
-            size: 18,
-            shouldBold: true,
-          ),
-          const SizedBox(height: 20),
-
-          // Bank accounts list
-          ...bankAccounts.map((account) => _buildBankAccountItem(account)),
-
-          const SizedBox(height: 16),
-
-          // Add bank account button
-          GestureDetector(
-            onTap: () {
-              Navigator.pop(context);
-              ProfileViewModel viewModel =
-                  Provider.of<ProfileViewModel>(context, listen: false);
-              viewModel.getBanks(shouldLoad: false);
-
-              // Navigate to add bank account screen
-              GoRouter.of(context).pushReplacementNamed(
-                K.addBankName,
-                // (route) => false, // Removes all routes until false is returned
-                extra: userProfileM,
-              );
-            },
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 16),
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Drag handle
+            Container(
+              width: 40,
+              height: 4,
               decoration: BoxDecoration(
-                border: Border.all(color: context.purpleText, width: 1.5),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.add_circle_outline, color: context.purpleText),
-                  const SizedBox(width: 8),
-                  CustomText(
-                    text: "ADD BANK ACCOUNT",
-                    color: context.purpleText,
-                    shouldBold: true,
-                  ),
-                ],
+                color: Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(2),
               ),
             ),
-          ),
-          const SizedBox(height: 16),
-        ],
+            const SizedBox(height: 20),
+
+            // Title
+            const CustomText(
+              text: "Select Bank Account",
+              size: 18,
+              shouldBold: true,
+            ),
+            const SizedBox(height: 20),
+
+            // Bank accounts list
+            ...bankAccounts.map((account) => _buildBankAccountItem(account)),
+
+            const SizedBox(height: 16),
+
+            // Add bank account button
+            GestureDetector(
+              onTap: () {
+                Navigator.pop(context);
+                ProfileViewModel viewModel =
+                    Provider.of<ProfileViewModel>(context, listen: false);
+                viewModel.getBanks(shouldLoad: false);
+
+                // Navigate to add bank account screen
+                GoRouter.of(context).pushReplacementNamed(
+                  K.addBankName,
+                  // (route) => false, // Removes all routes until false is returned
+                  extra: userProfileM,
+                );
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                decoration: BoxDecoration(
+                  border: Border.all(color: context.purpleText, width: 1.5),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.add_circle_outline, color: context.purpleText),
+                    const SizedBox(width: 8),
+                    CustomText(
+                      text: "ADD BANK ACCOUNT",
+                      color: context.purpleText,
+                      shouldBold: true,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
       ),
-    ),
     );
   }
 

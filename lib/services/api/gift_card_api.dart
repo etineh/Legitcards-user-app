@@ -8,7 +8,7 @@ import '../../data/models/history_model.dart';
 
 class GiftCardApi {
   static final String baseUrl = K.baseUrl;
-// static String baseUrl = "http://172.20.10.2:7000";
+  // static String baseUrl = "http://172.20.10.2:7000";
 
   Future<GiftCardResponseM> fetchAllAssets(String token) async {
     final url = Uri.parse('$baseUrl/api/assets/users/get/all');

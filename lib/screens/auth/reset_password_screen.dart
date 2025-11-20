@@ -44,7 +44,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     try {
       // prepare map to send to API
       final passwordMap = {
-        "recoverytoken": _codeController.text,
+        "recoverytoken": _codeController.text.toUpperCase(),
         "email": email,
         "password": _newPasswordController.text,
       };

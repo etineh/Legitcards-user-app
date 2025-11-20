@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:legit_cards/Utilities/cache_utils.dart';
@@ -124,13 +126,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 currentIndex = index;
               });
             },
-            items: const [
-              BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-              BottomNavigationBarItem(
+            items: [
+              const BottomNavigationBarItem(
+                  icon: Icon(Icons.home), label: "Home"),
+              const BottomNavigationBarItem(
                   icon: Icon(Icons.card_giftcard), label: "Cards"),
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.currency_bitcoin), label: "Coins"),
-              BottomNavigationBarItem(
+              if (Platform.isAndroid)
+                const BottomNavigationBarItem(
+                    icon: Icon(Icons.currency_bitcoin), label: "Coins"),
+              const BottomNavigationBarItem(
                   icon: Icon(Icons.history), label: "History"),
             ],
           ),
@@ -165,10 +169,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
           transferSelectCard: card,
         );
       case 2:
-        return CoinScreen(
-          userProfileM: userProfileM,
-          onTabChange: onTabChange,
-        );
+        return Platform.isIOS
+            ? HistoryScreen(
+                userProfileM: userProfileM,
+              )
+            : CoinScreen(
+                userProfileM: userProfileM,
+                onTabChange: onTabChange,
+              );
       case 3:
         return HistoryScreen(
           userProfileM: userProfileM,

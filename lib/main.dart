@@ -2,43 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
-import 'package:legit_cards/data/models/user_model.dart';
+import 'package:legit_cards/constants/app_notification.dart';
+import 'package:legit_cards/constants/app_router.dart';
+import 'package:legit_cards/constants/app_theme.dart';
 import 'package:legit_cards/extension/inbuilt_ext.dart';
 import 'package:legit_cards/screens/auth/auth_view_model.dart';
-import 'package:legit_cards/screens/auth/login_2fa_screen.dart';
-import 'package:legit_cards/screens/auth/login_screen.dart';
-import 'package:legit_cards/screens/auth/otp_screen.dart';
-import 'package:legit_cards/screens/auth/request_code_screen.dart';
-import 'package:legit_cards/screens/auth/reset_password_screen.dart';
-import 'package:legit_cards/screens/auth/signup_screen.dart';
 import 'package:legit_cards/screens/dashboard/coins/crypto_vm.dart';
-import 'package:legit_cards/screens/dashboard/dashboard_screen.dart';
 import 'package:legit_cards/screens/dashboard/gift_cards/gift_card_vm.dart';
 import 'package:legit_cards/screens/dashboard/history/history_view_model.dart';
-import 'package:legit_cards/screens/notification/notification_detail_screen.dart';
-import 'package:legit_cards/screens/notification/notification_screen.dart';
 import 'package:legit_cards/screens/notification/notification_view_model.dart';
-import 'package:legit_cards/screens/profile/bank/add_bank_screen.dart';
-import 'package:legit_cards/screens/profile/advance_screen.dart';
-import 'package:legit_cards/screens/profile/bank/all_bank_accounts_screen.dart';
-import 'package:legit_cards/screens/profile/change_password_screen.dart';
-import 'package:legit_cards/screens/profile/direct_support_screen.dart';
-import 'package:legit_cards/screens/profile/edit_profile_screen.dart';
-import 'package:legit_cards/screens/profile/enable_2fa_screen.dart';
-import 'package:legit_cards/screens/profile/profile_screen.dart';
 import 'package:legit_cards/screens/profile/profile_view_model.dart';
-import 'package:legit_cards/screens/profile/support/live_support_screen.dart';
-import 'package:legit_cards/screens/profile/support/support_chatList_screen.dart';
-import 'package:legit_cards/screens/profile/update_pin_screen.dart';
 import 'package:legit_cards/screens/wallet/wallet_view_model.dart';
-import 'package:legit_cards/screens/wallet/withdrawal_receipt_screen.dart';
-import 'package:legit_cards/screens/wallet/withdrawal_screen.dart';
 import 'package:legit_cards/services/firebase_messaging_service.dart';
-import 'constants/app_colors.dart';
 import 'constants/k.dart';
-import 'data/models/auth_model.dart';
 import 'data/models/notification_model.dart';
-import 'data/models/wallet_model.dart';
 import 'firebase_options.dart';
 import 'platform_stub.dart' if (dart.library.html) 'platform_web.dart';
 import 'package:provider/provider.dart';
@@ -88,227 +65,10 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    _setupNotificationListener();
-    _router = _createRouter();
-  }
-
-  // Setup notification listener
-  void _setupNotificationListener() {
-    widget.messagingService.notificationTapStream.listen((data) {
-      // print('General log: Notification tap received: $data');
-
-      if (data['action'] == 'navigate_to_detail' ||
-          data['action'] == 'notification_tapped') {
-        // Use WidgetsBinding to ensure we have a valid context
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          final context = _router.routerDelegate.navigatorKey.currentContext;
-
-          if (context != null && context.mounted) {
-            // Create notification model from the data received
-            final notificationM = NotificationM(
-              id: data['data']?['id'] ?? '',
-              timer: data['data']?['timer'] ?? 0,
-              notification: NotificationContent(
-                title: data['title'] ?? 'Notification',
-                body: data['body'] ?? '',
-              ),
-              receiverId: data['data']?['receiver_id'] ?? '',
-              reference: data['data']?['reference'] ?? '',
-              createdAt: data['data']?['createdAt'] != null
-                  ? data['data']['createdAt'] ?? DateTime.now().toString()
-                  : DateTime.now().toString(),
-              updatedAt: DateTime.now().toString(),
-            );
-
-            // Navigate using your custom method
-            context.goNextScreenWithData(
-              K.notificationDetailScreen,
-              extra: notificationM,
-            );
-          }
-        });
-      }
-    });
-  }
-
-  GoRouter _createRouter() {
-    return GoRouter(
-      initialLocation: K.loginPath,
-      routes: [
-        GoRoute(
-          name: K.dashboardScreen,
-          path: K.dashboardScreen,
-          builder: (context, state) {
-            final userProfile = state.extra as UserProfileM?;
-            return DashboardScreen(userProfileM: userProfile);
-          },
-        ),
-        GoRoute(
-          name: K.signupPath,
-          path: K.signupPath,
-          builder: (context, state) => const SignupScreen(),
-        ),
-        GoRoute(
-          name: K.profilePath,
-          path: K.profilePath,
-          builder: (context, state) {
-            final userProfile = state.extra as UserProfileM;
-            return ProfileScreen(user: userProfile);
-          },
-        ),
-        GoRoute(
-          name: K.loginPath,
-          path: K.loginPath,
-          builder: (context, state) => const LoginScreen(),
-        ),
-        GoRoute(
-          name: K.requestCode,
-          path: K.requestCode,
-          builder: (context, state) => const RequestCodeScreen(),
-        ),
-        GoRoute(
-          name: K.advanceScreen,
-          path: K.advanceScreen,
-          builder: (context, state) {
-            final userData = state.extra as UserProfileM;
-            return AdvanceScreen(user: userData);
-          },
-        ),
-        GoRoute(
-          name: K.directSupportScreen,
-          path: K.directSupportScreen,
-          builder: (context, state) => const DirectSupportScreen(),
-        ),
-        GoRoute(
-          name: K.viewBankAccount,
-          path: K.viewBankAccount,
-          builder: (context, state) {
-            final userData = state.extra as UserProfileM?;
-            return AllBankAccountsScreen(userProfileM: userData);
-          },
-        ),
-        GoRoute(
-          name: K.withdrawScreen,
-          path: K.withdrawScreen,
-          builder: (context, state) {
-            final userData = state.extra as UserProfileM?;
-            return WithdrawalScreen(userProfileM: userData);
-          },
-        ),
-        GoRoute(
-          name: K.withdrawReceiptScreen,
-          path: K.withdrawReceiptScreen,
-          builder: (context, state) {
-            final withdrawalRecord = state.extra as WithdrawRecordM;
-            return WithdrawalReceiptScreen(withdrawalRecord: withdrawalRecord);
-          },
-        ),
-        GoRoute(
-          name: K.resetPassword,
-          path: K.resetPassword,
-          builder: (context, state) {
-            final email = state.extra as String?;
-            return ResetPasswordScreen(email: email!);
-          },
-        ),
-        GoRoute(
-          name: K.otpPath,
-          path: K.otpPath,
-          builder: (context, state) {
-            final userData = state.extra as UserNavigationData?;
-            return OtpScreen(user: userData);
-          },
-        ),
-        GoRoute(
-          name: K.updatePin,
-          path: K.updatePin,
-          builder: (context, state) {
-            final userData = state.extra as UserProfileM?;
-            return UpdatePinScreen(user: userData);
-          },
-        ),
-        GoRoute(
-          name: K.enable2Fa,
-          path: K.enable2Fa,
-          builder: (context, state) {
-            final userData = state.extra as UserProfileM?;
-            return Enable2FaScreen(user: userData);
-          },
-        ),
-        GoRoute(
-          name: K.addBankName,
-          path: K.addBankName,
-          builder: (context, state) {
-            final userData = state.extra as UserProfileM?;
-            return AddBankAccountScreen(user: userData);
-          },
-        ),
-        GoRoute(
-          name: K.login2Fa,
-          path: K.login2Fa,
-          builder: (context, state) {
-            final userData = state.extra as SignModel?;
-            return Login2FaScreen(user: userData);
-          },
-        ),
-        GoRoute(
-          name: K.editProfile,
-          path: K.editProfile,
-          builder: (context, state) {
-            final userData = state.extra as UserProfileM?;
-            return EditProfileScreen(user: userData);
-          },
-        ),
-        GoRoute(
-          name: K.changePassword,
-          path: K.changePassword,
-          builder: (context, state) {
-            final userData = state.extra as UserProfileM?;
-            return ChangePasswordScreen(user: userData);
-          },
-        ),
-        GoRoute(
-          name: K.notificationScreen,
-          path: K.notificationScreen,
-          builder: (context, state) {
-            final userData = state.extra as UserProfileM;
-            return NotificationScreen(user: userData);
-          },
-        ),
-        // ADD THIS NEW ROUTE FOR NOTIFICATION DETAIL
-        GoRoute(
-          name: K.notificationDetailScreen,
-          path: K.notificationDetailScreen,
-          builder: (context, state) {
-            final data = state.extra as Map<String, dynamic>;
-
-            // Create NotificationM from the data
-            final notification = NotificationM(
-              id: data['data']?['id'] ?? '',
-              timer: 0,
-              notification: NotificationContent(
-                title: data['title'] ?? '',
-                body: data['body'] ?? '',
-              ),
-              receiverId: data['data']?['receiver_id'] ?? '',
-              reference: data['data']?['reference'] ?? '',
-              createdAt: data['createdAt'] ?? '' ?? DateTime.now().toString(),
-              updatedAt: DateTime.now().toString(),
-            );
-
-            return NotificationDetailScreen(notification: notification);
-          },
-        ),
-        GoRoute(
-          name: K.supportChatsScreen,
-          path: K.supportChatsScreen,
-          builder: (context, state) {
-            final userData = state.extra as UserProfileM;
-            return SupportChatListScreen(userProfile: userData);
-          },
-        ),
-      ],
-    );
+    // _setupNotificationListener();
+    _router = AppRouter.router;
+    AppNotification.setupNotificationListener(
+        widget, _router.routerDelegate.navigatorKey.currentContext);
   }
 
   @override
@@ -316,42 +76,8 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp.router(
       title: 'Legit Cards',
       routerConfig: _router,
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: const ColorScheme(
-          brightness: Brightness.light,
-          primary: AppColors.lightPurple,
-          onPrimary: AppColors.black,
-          secondary: AppColors.white,
-          onSecondary: AppColors.defaultBlack,
-          error: AppColors.errorDark,
-          onError: AppColors.white,
-          surface: AppColors.cardLight,
-          onSurface: AppColors.appLight,
-          scrim: AppColors.iconBgLight,
-          shadow: AppColors.cardLight,
-          outline: AppColors.greenLight,
-          tertiary: AppColors.grayBackgroundLight,
-        ),
-      ),
-      darkTheme: ThemeData(
-        useMaterial3: true,
-        colorScheme: const ColorScheme(
-          brightness: Brightness.dark,
-          primary: AppColors.lighterPurple,
-          onPrimary: AppColors.white,
-          secondary: AppColors.black,
-          onSecondary: AppColors.defaultWhite,
-          error: AppColors.errorDark,
-          onError: AppColors.white,
-          surface: AppColors.cardDark,
-          onSurface: AppColors.pureBlack,
-          scrim: AppColors.cardDark,
-          shadow: AppColors.cardOption,
-          outline: AppColors.greenDark,
-          tertiary: AppColors.grayBackgroundDark,
-        ),
-      ),
+      theme: AppTheme.themeDataLight,
+      darkTheme: AppTheme.themeDataDark,
       themeMode: ThemeMode.system,
       debugShowCheckedModeBanner: false,
       builder: (context, child) {
@@ -359,7 +85,8 @@ class _MyAppState extends State<MyApp> {
         SystemChrome.setSystemUIOverlayStyle(
           SystemUiOverlayStyle(
             statusBarColor: Colors.transparent,
-            statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+            statusBarIconBrightness:
+                isDark ? Brightness.light : Brightness.dark,
             statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
           ),
         );

@@ -230,7 +230,9 @@ class _GiftCardScreenState extends State<GiftCardScreen> {
     final giftCardVM = Provider.of<GiftCardTradeVM>(context);
 
     return transferSelectCard == null
-        ? _buildCardOption(giftCardVM) // 2 grid layout
+        ? Platform.isAndroid
+            ? _buildCardOption(giftCardVM)
+            : _sellCardInputs(giftCardVM) // 2 grid layout
         : _sellCardInputs(giftCardVM);
   }
 
@@ -276,9 +278,15 @@ class _GiftCardScreenState extends State<GiftCardScreen> {
           ),
           const SizedBox(height: 16),
           Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15.0),
-              child: _build2GridCardList(viewModel),
+            child: RefreshIndicator(
+              onRefresh: () async {
+                await viewModel.fetchCardAssets(userProfileM.token!,
+                    context: context);
+              },
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                child: _build2GridCardList(viewModel),
+              ),
             ),
           ),
           const SizedBox(height: 5),
@@ -295,49 +303,63 @@ class _GiftCardScreenState extends State<GiftCardScreen> {
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTap: () => context.hideKeyboard(),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                // Header with balance
-                const CustomText(text: "Get funded in few minutes! ☺️"),
-                const SizedBox(height: 20),
+          child: RefreshIndicator(
+            onRefresh: () async {
+              // Refresh card assets
+              selectedCardAsset = null;
+              selectedCountry = null;
+              selectedType = null;
+              giftCardVM.emptyRate();
+              await giftCardVM.fetchCardAssets(userProfileM.token!,
+                  context: context);
+            },
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // Header with balance
+                  if (!Platform.isIOS)
+                    const CustomText(text: "Get funded in few minutes! ☺️"),
+                  const SizedBox(height: 20),
 
-                // Gift Card Category selection
-                _buildGiftCardSelector(giftCardVM),
-                const SizedBox(height: 12),
+                  // Gift Card Category selection
+                  _buildGiftCardSelector(giftCardVM),
+                  const SizedBox(height: 12),
 
-                // Sub-category selection
-                _buildCountrySelector(giftCardVM),
-                const SizedBox(height: 12),
+                  // Sub-category selection
+                  _buildCountrySelector(giftCardVM),
+                  const SizedBox(height: 12),
 
-                // Sub-category selection
-                _buildAssetTypeSelector(giftCardVM),
-                const SizedBox(height: 12),
+                  // Sub-category selection
+                  _buildAssetTypeSelector(giftCardVM),
+                  const SizedBox(height: 12),
 
-                // Amount input
-                _buildAmountInput(),
-                const SizedBox(height: 12),
+                  // Amount input
+                  _buildAmountInput(),
+                  const SizedBox(height: 12),
 
-                // Quantity
-                _buildQuantity(),
-                const SizedBox(height: 12),
+                  // Quantity
+                  _buildQuantity(),
+                  const SizedBox(height: 12),
 
-                // Rate display
-                _buildRateDisplay(),
-                const SizedBox(height: 20),
+                  // Rate display
+                  _buildRateDisplay(),
+                  const SizedBox(height: 20),
 
-                // require number of images
-                _imageInfo(),
-                const SizedBox(height: 15),
+                  // require number of images
+                  _imageInfo(),
+                  const SizedBox(height: 15),
 
-                // Upload images section
-                _buildImageUploadSection(),
-                const SizedBox(height: 30),
+                  // Upload images section
+                  _buildImageUploadSection(),
+                  const SizedBox(height: 30),
 
-                // Proceed button
-                _buildProceedButton(),
-              ],
+                  // Proceed button
+                  _buildProceedButton(),
+                  const SizedBox(height: 30),
+                ],
+              ),
             ),
           ),
         ),
@@ -380,7 +402,8 @@ class _GiftCardScreenState extends State<GiftCardScreen> {
               ],
             ),
           ),
-          selectedCardAsset?.specialInfo == null
+          (selectedCardAsset?.specialInfo == null ||
+                  selectedCardAsset!.specialInfo!.isEmpty)
               ? const SizedBox.shrink()
               : _buildWarningMessage(selectedCardAsset!.specialInfo!),
         ],
@@ -523,7 +546,12 @@ class _GiftCardScreenState extends State<GiftCardScreen> {
               const BoxConstraints(minWidth: 0, minHeight: 0),
           hintText: selectedRate == null
               ? 'Card Amount'
-              : "Enter amount: ${selectedRate!.from.toInt()} to ${selectedRate!.to.toInt()}",
+              : selectedRate!.fixRange != null &&
+                      selectedRate!.fixRange!.isNotEmpty
+                  ? "Amount: ${selectedRate!.fixRange!.split(',').join(' or ')}"
+                  : selectedRate!.to <= 0
+                      ? "Enter amount: ${selectedRate!.from.toInt()} to above"
+                      : "Enter amount: ${selectedRate!.from.toInt()} to ${selectedRate!.to.toInt()}",
           hintStyle: TextStyle(color: context.defaultColor.withOpacity(0.2)),
           border: InputBorder.none,
         ),
@@ -905,53 +933,104 @@ class _GiftCardScreenState extends State<GiftCardScreen> {
       itemCount: filtered.length,
       itemBuilder: (context, index) {
         final category = filtered[index];
-        return Container(
-          margin: const EdgeInsets.only(bottom: 8),
-          decoration: BoxDecoration(
-            color: context.cardColor,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: ListTile(
-            // logo
-            leading: Container(
-              width: 60,
-              // height: 40,
-              decoration: BoxDecoration(
-                shape: BoxShape.rectangle,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              clipBehavior: Clip.antiAlias,
-              child: CachedNetworkImage(
-                imageUrl: category.images[0],
-                fit: BoxFit.cover,
-                placeholder: (context, url) => const Center(
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                ),
-                errorWidget: (context, url, error) =>
-                    const Icon(Icons.error, color: Colors.red),
-              ),
+        final isActive = category.cardActive;
+
+        return Opacity(
+          opacity: isActive ? 1.0 : 0.5,
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 8),
+            decoration: BoxDecoration(
+              color: context.cardColor,
+              borderRadius: BorderRadius.circular(12),
             ),
-            title: Text(
-              category.name,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: context.blackWhite,
+            child: ListTile(
+              // logo
+              leading: Platform.isAndroid
+                  ? Container(
+                      width: 60,
+                      // height: 40,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.rectangle,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      clipBehavior: Clip.antiAlias,
+                      child: CachedNetworkImage(
+                        imageUrl: category.images[0],
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) => const Center(
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                        errorWidget: (context, url, error) =>
+                            const Icon(Icons.error, color: Colors.red),
+                      ),
+                    )
+                  : Container(
+                      width: 40,
+                      height: 40,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: LinearGradient(
+                          colors: [
+                            Color(0xFFBF2882), // light purple
+                            Color(0xFF5B2C98), // deep indigo
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                      ),
+                      child: Center(
+                        child: Text(
+                          AdjustUtils.getCardAbbreviation(category.name),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+              title: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    category.name,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: context.blackWhite,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    'Active: ${isActive ? "Yes" : "No"}',
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: isActive ? Colors.green : Colors.red,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
               ),
+              onTap: () {
+                // Check if card is active
+                if (!isActive) {
+                  context.toastMsg('Card not active yet!');
+                  return;
+                }
+
+                setState(() {
+                  selectedCardAsset = category;
+                  selectedCountry = null;
+                  selectedType = null;
+                  selectedRate = null;
+                });
+                Navigator.pop(context);
+                // fetch rate
+                viewModel.fetchAssetRates(userProfileM, category.id,
+                    context: context, shouldLoad: true);
+                context.hideKeyboard(); // hide keyboard
+              },
             ),
-            onTap: () {
-              setState(() {
-                selectedCardAsset = category;
-                selectedCountry = null;
-                selectedType = null;
-                selectedRate = null;
-              });
-              Navigator.pop(context);
-              // fetch rate
-              viewModel.fetchAssetRates(userProfileM, category.id,
-                  context: context, shouldLoad: true);
-              context.hideKeyboard(); // hide keyboard
-            },
           ),
         );
       },
@@ -971,15 +1050,21 @@ class _GiftCardScreenState extends State<GiftCardScreen> {
     }).toList();
 
     if (filtered.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.search_off, size: 64, color: Colors.grey[400]),
-            const SizedBox(height: 16),
-            const CustomText(text: "No categories found!"),
-          ],
-        ),
+      return ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: [
+          SizedBox(height: MediaQuery.of(context).size.height * 0.3),
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.search_off, size: 64, color: Colors.grey[400]),
+                const SizedBox(height: 16),
+                const CustomText(text: "No categories found!"),
+              ],
+            ),
+          ),
+        ],
       );
     }
 
@@ -1000,6 +1085,12 @@ class _GiftCardScreenState extends State<GiftCardScreen> {
           // context: context,
           giftCardAsset: cardAsset,
           onTap: () {
+            // Check if card is active
+            if (!cardAsset.cardActive) {
+              context.toastMsg('Card not active yet!');
+              return;
+            }
+
             setState(() {
               selectedCardAsset = cardAsset;
               transferSelectCard = cardAsset;
@@ -1129,29 +1220,57 @@ class _GiftCardScreenState extends State<GiftCardScreen> {
                 children: viewModel
                     .getFilterType(selectedCardAsset!.id, selectedCountry!)
                     .map((item) {
-                  return GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        selectedType = item.type;
-                        selectedRate = item;
-                      });
-                      Navigator.pop(context);
-                      _calculateRate();
-                      context.hideKeyboard(); // hide keyboard
-                    },
-                    child: Container(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: context.cardColor,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        item.type,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: context.blackWhite,
+                  final isActive = item.rateActive;
+
+                  return Opacity(
+                    opacity: isActive ? 1.0 : 0.5,
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context);
+
+                        // Check if rate is active
+                        if (!isActive) {
+                          context.toastMsg('Rate not active at the moment');
+                          return;
+                        }
+
+                        setState(() {
+                          selectedType = item.type;
+                          selectedRate = item;
+                        });
+                        _calculateRate();
+                        context.hideKeyboard(); // hide keyboard
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: context.cardColor,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          children: [
+                            // Status indicator dot
+                            Container(
+                              width: 8,
+                              height: 8,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: isActive ? Colors.green : Colors.red,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                item.type,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: context.blackWhite,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -1231,20 +1350,53 @@ class _GiftCardScreenState extends State<GiftCardScreen> {
 
   Future<void> _proceedTransaction() async {
     context.hideKeyboard();
+
     final giftCardVM = Provider.of<GiftCardTradeVM>(context, listen: false);
 
     setState(() => _isAmountInvalid = false);
 
     final amount = double.tryParse(_amountController.text) ?? 0.0;
 
-    if (selectedRate != null &&
-        (amount < selectedRate!.from || amount > selectedRate!.to)) {
-      setState(() => _isAmountInvalid = true);
-      context.toastMsg(
-        "Card amount should be between ${selectedRate!.from} to ${selectedRate!.to}",
-        color: Colors.red,
-      );
-      return;
+    if (selectedRate != null) {
+      // Check if fixRange is set (fixed values)
+      if (selectedRate!.fixRange != null &&
+          selectedRate!.fixRange!.isNotEmpty) {
+        final fixedValues = selectedRate!.fixRange!
+            .split(',')
+            .map((e) => double.tryParse(e.trim()) ?? 0)
+            .toList();
+
+        if (!fixedValues.contains(amount)) {
+          setState(() => _isAmountInvalid = true);
+          context.toastMsg(
+            "Card amount must be one of: ${selectedRate!.fixRange}",
+            color: Colors.red,
+          );
+          return;
+        }
+      } else {
+        // Check if amount is below minimum
+        if (amount < selectedRate!.from) {
+          setState(() => _isAmountInvalid = true);
+          final maxText =
+              selectedRate!.to <= 0 ? "above" : selectedRate!.to.toString();
+          context.toastMsg(
+            "Card amount should be between ${selectedRate!.from} to $maxText",
+            color: Colors.red,
+          );
+          return;
+        }
+
+        // Check if amount exceeds maximum (only if 'to' is set)
+        if (selectedRate!.to > 0 && amount > selectedRate!.to) {
+          setState(() => _isAmountInvalid = true);
+          context.toastMsg(
+            "Card amount should be between ${selectedRate!.from} to ${selectedRate!.to}",
+            color: Colors.red,
+          );
+          return;
+        }
+      }
     }
 
     giftCardVM.setIsLoadToTrue();
@@ -1296,7 +1448,9 @@ class _GiftCardScreenState extends State<GiftCardScreen> {
       if (mounted) context.toastMsg("Trade submitted!", color: Colors.green);
       // go to history
       CacheUtils.reloadCardTab = true;
-      onTabChange?.call(3);
+      // iOS: 3 tabs (0=Home, 1=Cards, 2=History)
+      // Android: 4 tabs (0=Home, 1=Cards, 2=Coins, 3=History)
+      onTabChange?.call(Platform.isIOS ? 2 : 3);
     }
     // print("General log: the total link image is - $uploadedUrls");
   }

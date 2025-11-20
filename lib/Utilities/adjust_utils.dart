@@ -182,4 +182,16 @@ class AdjustUtils {
         transaction.status.toLowerCase() == 'selling' ||
         transaction.status.toLowerCase() == 'exchanging');
   }
+
+  // Get card abbreviation (2 letters for multi-word, 1 for single word)
+  static String getCardAbbreviation(String cardName) {
+    final words = cardName.trim().split(' ');
+    if (words.length >= 2) {
+      // Take first letter of first two words
+      return '${words[0][0]}${words[1][0]}'.toUpperCase();
+    } else {
+      // Take first letter for single word
+      return words[0][0].toUpperCase();
+    }
+  }
 }

@@ -33,7 +33,7 @@ class GiftCardTradeVM extends ChangeNotifier {
     if (response.statusCode == "ASSET_FETCHED") {
       // Filter only active cards
       final filteredAssets = response.data
-          .where((asset) => asset.cardActive == true)
+          // .where((asset) => asset.cardActive == true)
           .toList()
         ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
 
@@ -49,7 +49,7 @@ class GiftCardTradeVM extends ChangeNotifier {
   }
 
   /// Map of assetId → list of rate models
-  final Map<String, List<GiftCardRateM>> _rates = {};
+  Map<String, List<GiftCardRateM>> _rates = {};
   Map<String, List<GiftCardRateM>> get rates => _rates;
 
   Future<void> fetchAssetRates(UserProfileM user, String assetId,
@@ -69,6 +69,11 @@ class GiftCardTradeVM extends ChangeNotifier {
         context.toastMsg(response.message);
       }
     }
+  }
+
+  void emptyRate() {
+    _rates = {};
+    notifyListeners();
   }
 
   Future<GiftCardResponseM> sellGiftCard(

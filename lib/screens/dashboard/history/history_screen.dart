@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:legit_cards/Utilities/adjust_utils.dart';
@@ -35,7 +37,8 @@ class _HistoryScreenState extends State<HistoryScreen>
   void initState() {
     super.initState();
     user = widget.userProfileM!;
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController =
+        TabController(length: !Platform.isIOS ? 3 : 2, vsync: this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _fetchCardAndCryptoTransactions();
       _fetchWithdrawTransactions();
@@ -104,7 +107,7 @@ class _HistoryScreenState extends State<HistoryScreen>
                     controller: _tabController,
                     children: [
                       _buildCardsTab(historyViewModel),
-                      _buildCoinsTab(historyViewModel),
+                      if (!Platform.isIOS) _buildCoinsTab(historyViewModel),
                       _buildWithdrawTab(historyViewModel),
                     ],
                   ),
@@ -145,10 +148,10 @@ class _HistoryScreenState extends State<HistoryScreen>
         ),
         indicatorSize: TabBarIndicatorSize.tab,
         dividerColor: Colors.transparent,
-        tabs: const [
-          Tab(text: 'CARDS'),
-          Tab(text: 'COINS'),
-          Tab(text: 'WITHDRAWS'),
+        tabs: [
+          const Tab(text: 'CARDS'),
+          if (!Platform.isIOS) const Tab(text: 'COINS'),
+          const Tab(text: 'WITHDRAWS'),
         ],
       ),
     );
@@ -336,21 +339,48 @@ class _HistoryScreenState extends State<HistoryScreen>
               borderRadius: BorderRadius.circular(8),
             ),
             clipBehavior: Clip.antiAlias,
-            child: CachedNetworkImage(
-              // set image
-              imageUrl: transaction.assetImage[0],
-              fit: BoxFit.cover,
-              placeholder: (context, url) => const Center(
-                child: CircularProgressIndicator(strokeWidth: 2),
-              ),
-              errorWidget: (context, url, error) => transaction.assetName
-                          .toLowerCase() ==
-                      "btc"
-                  ? const Icon(Icons.currency_bitcoin, color: Colors.orange)
-                  : const Icon(Icons.settings_ethernet, color: Colors.orange),
-            ),
+            child: Platform.isAndroid
+                ? CachedNetworkImage(
+                    // set image
+                    imageUrl: transaction.assetImage[0],
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) => const Center(
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                    errorWidget: (context, url, error) =>
+                        transaction.assetName.toLowerCase() == "btc"
+                            ? const Icon(Icons.currency_bitcoin,
+                                color: Colors.orange)
+                            : const Icon(Icons.settings_ethernet,
+                                color: Colors.orange),
+                  )
+                : Container(
+                    width: 40,
+                    height: 40,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(
+                        colors: [
+                          Color(0xFFBF2882), // light purple
+                          Color(0xFF5B2C98), // deep indigo
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                    ),
+                    child: Center(
+                      child: Text(
+                        AdjustUtils.getCardAbbreviation(transaction.assetName),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 6),
           // Transaction Details
           Expanded(
             child: Column(

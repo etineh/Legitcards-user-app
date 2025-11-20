@@ -15,85 +15,108 @@ class GiftCardItemWG extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isActive = giftCardAsset.cardActive;
+
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        // margin: const EdgeInsets.symmetric(horizontal: 12),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Column(
-          children: [
-            // 🖼️ Image section
-            Expanded(
-              // flex: 3,
-              child: Container(
-                decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.vertical(
-                    top: Radius.circular(12),
-                  ),
-                ),
-                clipBehavior: Clip.antiAlias,
-                child: CachedNetworkImage(
-                  imageUrl: giftCardAsset.images.isNotEmpty
-                      ? giftCardAsset.images[0]
-                      : '',
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                  placeholder: (context, url) => Container(
-                    color: Colors.grey[200],
-                    child: const Center(
-                      child: CircularProgressIndicator(strokeWidth: 2),
+      child: Opacity(
+        opacity: isActive ? 1.0 : 0.5,
+        child: Container(
+          // margin: const EdgeInsets.symmetric(horizontal: 12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Column(
+            children: [
+              // 🖼️ Image section
+              Expanded(
+                // flex: 3,
+                child: Container(
+                  decoration: const BoxDecoration(
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(12),
                     ),
                   ),
-                  errorWidget: (context, url, error) => Container(
-                    color: Colors.grey[200],
-                    child: const Icon(Icons.card_giftcard, size: 40),
+                  clipBehavior: Clip.antiAlias,
+                  child: CachedNetworkImage(
+                    imageUrl: giftCardAsset.images.isNotEmpty
+                        ? giftCardAsset.images[0]
+                        : '',
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    placeholder: (context, url) => Container(
+                      color: Colors.grey[200],
+                      child: const Center(
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                    ),
+                    errorWidget: (context, url, error) => Container(
+                      color: Colors.grey[200],
+                      child: const Icon(Icons.card_giftcard, size: 40),
+                    ),
                   ),
                 ),
               ),
-            ),
 
-            // 🏷️ Label section - Fixed height
-            Container(
-              width: double.infinity,
-              height: 20,
-              decoration: const BoxDecoration(
-                color: AppColors.lightPurple,
-                borderRadius: BorderRadius.vertical(
-                  bottom: Radius.circular(12),
+              // 🏷️ Label section with name and status indicator
+              Container(
+                width: double.infinity,
+                height: 20,
+                decoration: BoxDecoration(
+                  color: isActive ? AppColors.lightPurple : Colors.grey[400],
+                  borderRadius: const BorderRadius.vertical(
+                    bottom: Radius.circular(12),
+                  ),
+                  border: const Border(
+                    top: BorderSide(
+                      color: Colors.white,
+                      width: 1,
+                    ),
+                  ),
                 ),
-                border: Border(
-                  top: BorderSide(
-                    color: Colors.white,
-                    width: 1,
+                child: Center(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Status indicator dot
+                      Container(
+                        width: 6,
+                        height: 6,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: isActive ? Colors.greenAccent : Colors.redAccent,
+                        ),
+                      ),
+                      const SizedBox(width: 5),
+                      Flexible(
+                        child: Text(
+                          giftCardAsset.name.toUpperCase(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 0.5,
+                          ),
+                          textAlign: TextAlign.center,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
-              child: Center(
-                child: Text(
-                  giftCardAsset.name.toUpperCase(),
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.5,
-                  ),
-                  textAlign: TextAlign.center,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

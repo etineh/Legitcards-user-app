@@ -4,7 +4,7 @@ class UpdateUserM {
   String? userid;
   final String firstname;
   final String lastname;
-  final String phoneNumber;
+  final String? phoneNumber;
   // String? email;
   final String password;
   final String gender;
@@ -14,7 +14,7 @@ class UpdateUserM {
     required this.userid,
     required this.firstname,
     required this.lastname,
-    required this.phoneNumber,
+    this.phoneNumber,
     // required this.email,
     required this.password,
     required this.gender,
@@ -53,7 +53,7 @@ class UserNavigationData {
 class SignModel {
   final String email;
   final String password;
-  final String phoneNumber;
+  final String? phoneNumber;
   final String devicename;
   final String devicetype;
   final String deviceos;
@@ -61,7 +61,7 @@ class SignModel {
   SignModel({
     required this.email,
     required this.password,
-    required this.phoneNumber,
+    this.phoneNumber,
     required this.devicename,
     required this.devicetype,
     required this.deviceos,

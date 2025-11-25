@@ -432,7 +432,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       color: Colors.white, size: 40),
                   const SizedBox(height: 10),
                   Text(
-                    Platform.isIOS ? "Giftcards\n" : "Sell your\nGiftcards",
+                    Platform.isIOS ? "Gift Cards" : "Sell your\nGiftcards",
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                       color: Colors.white,
@@ -440,6 +440,14 @@ class _HomeScreenState extends State<HomeScreen> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
+                  if (Platform.isIOS) ...[
+                    const SizedBox(height: 5),
+                    const CustomText(
+                      text: "Rate Calculator",
+                      color: Colors.white,
+                      size: 13,
+                    )
+                  ],
                 ],
               ),
             ),
@@ -451,7 +459,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: InkWell(
             onTap: () {
               // Navigate to trade coins
-              Platform.isIOS ? onTabChange?.call(1) : onTabChange?.call(2);
+              onTabChange?.call(2);
             },
             child: Container(
               padding: const EdgeInsets.all(20),
@@ -463,15 +471,11 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               child: Column(
                 children: [
-                  Icon(
-                      Platform.isIOS
-                          ? Icons.rate_review
-                          : Icons.currency_bitcoin,
-                      color: Colors.orange,
-                      size: 40),
+                  const Icon(Icons.currency_bitcoin,
+                      color: AppColors.lightPurple, size: 40),
                   const SizedBox(height: 10),
                   Text(
-                    Platform.isIOS ? "Rate\nCalculator" : "Trade your\nCoins",
+                    Platform.isIOS ? "Crypto\nTo Naira" : "Trade your\nCoins",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: context.purpleText,
@@ -646,7 +650,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 6),
               itemCount: categories.length,
               itemBuilder: (context, index) {
                 final category = categories[index];
@@ -701,7 +705,41 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                             ),
                           ),
-                    title: CustomText(text: category.name, shouldBold: true),
+                    title: CustomText(
+                      text: category.name,
+                      shouldBold: Platform.isAndroid,
+                    ),
+                    trailing: Platform.isIOS
+                        ? ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.lightPurple,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 8,
+                              ),
+                            ),
+                            onPressed: () {
+                              // open the card screen
+                              widget.onTabChange?.call(1);
+
+                              // pass the selected card to the screen
+                              widget.onCardSelected?.call(category);
+
+                              // fetch card rate
+                              giftCardVM.fetchAssetRates(
+                                userProfileM!,
+                                category.id,
+                                context: context,
+                                shouldLoad: true,
+                              );
+                            },
+                            child: const Text("Check Rate"),
+                          )
+                        : null,
                     onTap: () {
                       // open the card screen
                       widget.onTabChange?.call(1);

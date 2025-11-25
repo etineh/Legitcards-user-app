@@ -50,10 +50,10 @@ class _SignupScreenState extends State<SignupScreen> {
 
     if (!_formKey.currentState!.validate()) return;
 
-    if (_gender == null) {
-      context.toastMsg("Please select your gender");
-      return;
-    }
+    // if (_gender == null) {
+    //   context.toastMsg("Please select your gender");
+    //   return;
+    // }
 
     if (!_termsAccepted) {
       context.toastMsg("Please accept the terms and conditions");
@@ -64,7 +64,9 @@ class _SignupScreenState extends State<SignupScreen> {
       String fullName = _fullNameController.text.trim();
       String email = _emailController.text.trim();
       String password = _passwordController.text.trim();
-      String pNumber = AdjustUtils.normalizePhone(_phoneNumberController.text);
+      String pNumber = _phoneNumberController.text.trim().isEmpty
+          ? AdjustUtils.randomNGNumber()
+          : AdjustUtils.normalizePhone(_phoneNumberController.text);
 
       // get the first name and last name from the fullName
       final user = UpdateUserM(
@@ -74,7 +76,7 @@ class _SignupScreenState extends State<SignupScreen> {
         phoneNumber: pNumber,
         // email: email,
         password: password,
-        gender: _gender!,
+        gender: _gender ?? "Undefined",
         username: AdjustUtils.generateUsername(fullName),
       );
 
@@ -170,18 +172,18 @@ class _SignupScreenState extends State<SignupScreen> {
 
                     const SizedBox(height: 10),
 
-                    // Phone Number Field
+                    // Phone Number Field (Optional)
                     InputField(
                       fillColor: context.cardColor,
                       controller: _phoneNumberController,
-                      labelText: 'Enter phone number',
+                      labelText: 'Enter phone number (optional)',
                       hintText: 'e.g 09076600660',
                       keyboardType: TextInputType.phone,
                       prefixIcon: Icons.phone,
                       inputFormatters: [
                         FilteringTextInputFormatter.digitsOnly,
                       ],
-                      validator: _validationService.validatePhone,
+                      validator: _validationService.validatePhoneOptional,
                     ),
 
                     const SizedBox(height: 10),

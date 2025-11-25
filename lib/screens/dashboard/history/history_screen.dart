@@ -37,8 +37,7 @@ class _HistoryScreenState extends State<HistoryScreen>
   void initState() {
     super.initState();
     user = widget.userProfileM!;
-    _tabController =
-        TabController(length: !Platform.isIOS ? 3 : 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _fetchCardAndCryptoTransactions();
       _fetchWithdrawTransactions();
@@ -107,7 +106,7 @@ class _HistoryScreenState extends State<HistoryScreen>
                     controller: _tabController,
                     children: [
                       _buildCardsTab(historyViewModel),
-                      if (!Platform.isIOS) _buildCoinsTab(historyViewModel),
+                      _buildCoinsTab(historyViewModel),
                       _buildWithdrawTab(historyViewModel),
                     ],
                   ),
@@ -148,10 +147,10 @@ class _HistoryScreenState extends State<HistoryScreen>
         ),
         indicatorSize: TabBarIndicatorSize.tab,
         dividerColor: Colors.transparent,
-        tabs: [
-          const Tab(text: 'CARDS'),
-          if (!Platform.isIOS) const Tab(text: 'COINS'),
-          const Tab(text: 'WITHDRAWS'),
+        tabs: const [
+          Tab(text: 'CARDS'),
+          Tab(text: 'COINS'),
+          Tab(text: 'WITHDRAWS'),
         ],
       ),
     );

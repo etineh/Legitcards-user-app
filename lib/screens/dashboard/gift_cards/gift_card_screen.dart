@@ -318,9 +318,12 @@ class _GiftCardScreenState extends State<GiftCardScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+                  if (Platform.isIOS) const SizedBox(height: 50),
+
                   // Header with balance
-                  if (!Platform.isIOS)
-                    const CustomText(text: "Get funded in few minutes! ☺️"),
+                  !Platform.isIOS
+                      ? const CustomText(text: "Get funded in few minutes! ☺️")
+                      : const CustomText(text: "Rate Calculator"),
                   const SizedBox(height: 20),
 
                   // Gift Card Category selection
@@ -347,16 +350,18 @@ class _GiftCardScreenState extends State<GiftCardScreen> {
                   _buildRateDisplay(),
                   const SizedBox(height: 20),
 
-                  // require number of images
-                  _imageInfo(),
-                  const SizedBox(height: 15),
+                  if (Platform.isAndroid) ...[
+                    // require number of images
+                    _imageInfo(),
+                    const SizedBox(height: 15),
 
-                  // Upload images section
-                  _buildImageUploadSection(),
-                  const SizedBox(height: 30),
+                    // Upload images section
+                    _buildImageUploadSection(),
+                    const SizedBox(height: 30),
 
-                  // Proceed button
-                  _buildProceedButton(),
+                    // Proceed button
+                    _buildProceedButton(),
+                  ],
                   const SizedBox(height: 30),
                 ],
               ),

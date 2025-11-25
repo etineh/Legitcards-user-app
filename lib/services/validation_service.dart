@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 class ValidationService {
   // Email validation
   String? validateEmail(String? value) {
@@ -73,6 +71,21 @@ class ValidationService {
     return null;
   }
 
+  // Optional phone validation (for AppStore compliance)
+  String? validatePhoneOptional(String? value) {
+    // Allow empty values
+    if (value == null || value.isEmpty) {
+      return null;
+    }
+    // Only validate format if a value is provided
+    if (value.length != 11) return 'Phone number must be 11 digits';
+    if (!RegExp(r'^\+?[\d\s\-\(\)]{10,}$')
+        .hasMatch(value.replaceAll(' ', ''))) {
+      return 'Please enter a valid phone number';
+    }
+    return null;
+  }
+
   // Generic required field validation
   String? validateRequired(String? value, String fieldName) {
     if (value == null || value.trim().isEmpty) {
@@ -103,7 +116,7 @@ class ValidationService {
     return {
       'email': validateEmail(email),
       'fullName': validateFullName(fullName),
-      'phoneNumber': validatePhone(phoneNumber),
+      'phoneNumber': validatePhoneOptional(phoneNumber),
       'password': validatePassword(password),
     };
   }

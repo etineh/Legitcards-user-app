@@ -126,15 +126,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 currentIndex = index;
               });
             },
-            items: [
-              const BottomNavigationBarItem(
-                  icon: Icon(Icons.home), label: "Home"),
-              const BottomNavigationBarItem(
+            items: const [
+              BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+              BottomNavigationBarItem(
                   icon: Icon(Icons.card_giftcard), label: "Cards"),
-              if (Platform.isAndroid)
-                const BottomNavigationBarItem(
-                    icon: Icon(Icons.currency_bitcoin), label: "Coins"),
-              const BottomNavigationBarItem(
+              BottomNavigationBarItem(
+                  icon: Icon(Icons.currency_bitcoin), label: "Coins"),
+              BottomNavigationBarItem(
                   icon: Icon(Icons.history), label: "History"),
             ],
           ),
@@ -169,14 +167,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
           transferSelectCard: card,
         );
       case 2:
-        return Platform.isIOS
-            ? HistoryScreen(
-                userProfileM: userProfileM,
-              )
-            : CoinScreen(
-                userProfileM: userProfileM,
-                onTabChange: onTabChange,
-              );
+        return CoinScreen(
+          userProfileM: userProfileM,
+          onTabChange: onTabChange,
+        );
       case 3:
         return HistoryScreen(
           userProfileM: userProfileM,

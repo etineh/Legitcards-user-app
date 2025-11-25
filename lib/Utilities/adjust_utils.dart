@@ -194,4 +194,29 @@ class AdjustUtils {
       return words[0][0].toUpperCase();
     }
   }
+
+  static final _random = Random();
+
+  // Common Nigerian prefixes
+  static const List<String> _prefixes = [
+    "070",
+    "080",
+    "081",
+    "090",
+    "091",
+    "071",
+  ];
+
+  /// Generates a random 11-digit Nigerian phone number
+  static String randomNGNumber() {
+    final prefix = _prefixes[_random.nextInt(_prefixes.length)];
+
+    // generate the remaining 8 digits
+    StringBuffer buffer = StringBuffer(prefix);
+    for (int i = 0; i < 8; i++) {
+      buffer.write(_random.nextInt(10)); // 0–9
+    }
+
+    return normalizePhone(buffer.toString());
+  }
 }

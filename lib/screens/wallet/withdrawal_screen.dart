@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -192,6 +194,7 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
       "pin": pin,
       "id": userProfileM.userid,
       "version": K.VERSION_CODE,
+      "iOSVersion": Platform.isIOS ? K.iOS_VERSION_CODE : null,
     };
 
     WalletViewModel walletVM =

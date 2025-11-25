@@ -54,6 +54,7 @@ class K {
 
   static const VERSION_CODE = "16017";
   static const VERSION_NAME = "1.28.0";
+  static const iOS_VERSION_CODE = "5";
 
   static bool isAndroid() {
     return Platform.isAndroid;

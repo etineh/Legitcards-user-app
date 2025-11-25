@@ -1,7 +1,10 @@
 #!/bin/bash
 chmod +x gitpush.sh
-# Prompt for commit message
-read -p "Enter commit message: " commit_message
+
+# Prompt for commit message (multi-line)
+echo "Enter commit message (press Ctrl+D when done, or Ctrl+C to cancel):"
+echo "---"
+commit_message=$(cat)
 
 # List all local branches
 echo "Select a branch to push to:"

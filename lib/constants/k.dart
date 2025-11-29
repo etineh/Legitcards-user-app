@@ -27,7 +27,7 @@ class K {
   static const supportChatsScreen = "/support-chats";
   static const notificationScreen = "/notification";
   static const String notificationDetailScreen = '/notification-detail';
-  // static const advanceScreen = "/advance";
+  static const airtimeReceiptScreen = "/airtime-receipt-screen";
 
   static const submitNow = "Submit Now";
   static const cancelTransaction = "Cancel Transaction";

@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:legit_cards/Utilities/cache_utils.dart';
 import 'package:legit_cards/constants/app_colors.dart';
 import 'package:legit_cards/constants/k.dart';
+import 'package:legit_cards/data/models/airtime_request.dart';
 import 'package:legit_cards/data/models/crypto_trade_m.dart';
 import 'package:legit_cards/extension/inbuilt_ext.dart';
 import 'package:legit_cards/screens/dashboard/coins/crypto_vm.dart';
@@ -18,6 +19,7 @@ import '../../../Utilities/adjust_utils.dart';
 import '../../../Utilities/cloudinary_utils.dart';
 import '../../../data/models/user_model.dart';
 import '../../widgets/PrimaryButton.dart';
+import 'network_dropdown_selector.dart';
 
 class CoinScreen extends StatefulWidget {
   final UserProfileM? userProfileM;
@@ -44,6 +46,7 @@ class _CoinScreenState extends State<CoinScreen> {
   List<File> uploadedImages = [];
   List<String> uploadedUrls = [];
   double calculatedRate = 0.0;
+  String airtimeNetwork = "";
 
   // Sample coin data
   final List<String> coins = [K.BTC, K.USDT, K.ETH];
@@ -142,11 +145,25 @@ class _CoinScreenState extends State<CoinScreen> {
   Future<void> _pickImage(ImageSource source) async {
     try {
       if (source == ImageSource.camera) {
-        // Camera still needs permission
-        final status = await Permission.camera.request();
+        // Check current camera permission status
+        var status = await Permission.camera.status;
+
+        // If not granted, request permission
+        if (!status.isGranted) {
+          status = await Permission.camera.request();
+          if (mounted) {
+            context.toastMsg("Go to setting and grant app camera permission");
+          }
+        }
+
+        // After requesting, check if it's still not granted
         if (!status.isGranted) {
           if (mounted) {
-            context.toastMsg("Camera permission denied");
+            // Show dialog to open settings
+            final shouldOpenSettings = await _shouldOpenSettings();
+            if (shouldOpenSettings == true) {
+              await openAppSettings();
+            }
           }
           return;
         }
@@ -200,69 +217,137 @@ class _CoinScreenState extends State<CoinScreen> {
     );
   }
 
+  Future<bool?> _shouldOpenSettings() async {
+    return await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const CustomText(
+          text: 'Camera Permission Required',
+          size: 18,
+        ),
+        content: const CustomText(
+          text:
+              'Camera access is required to take photos. Please enable it in Settings.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Open Settings'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final cryptoVM = Provider.of<CryptoViewModel>(context);
     return Scaffold(
       backgroundColor: context.backgroundColor,
-      body: ModalProgressHUD(
-        inAsyncCall: cryptoVM.isLoading,
-        child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: () => context.hideKeyboard(),
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                // Coin Selector
-                _buildCoinSelector(cryptoVM),
-                const SizedBox(height: 16),
-
-                // Network Selector
-                if (selectedCoin != null) _buildNetworkSelector(cryptoVM),
-                if (selectedCoin != null) const SizedBox(height: 20),
-
-                if (selectedNetwork != null) ...[
-                  // QR Code and Wallet Address Section
-                  _buildQRCodeSection(),
-                  const SizedBox(height: 10),
-                  _buildWalletAddressSection(),
-                  const SizedBox(height: 10),
-                  _buildWarningMessage(),
-                  const SizedBox(height: 20),
-
-                  // Amount Input
-                  _buildAmountInput(cryptoVM),
-                  const SizedBox(height: 16),
-
-                  // if (_amountController.text.isNotEmpty &&
-                  //     double.tryParse(_amountController.text) != null &&
-                  //     double.tryParse(_amountController.text)! > 0) ...[
-                  //   // _buildRateDisplay(),
-                  //   // const SizedBox(height: 20),
-                  // ],
-
-                  // Rate Display
-                  _buildRateDisplay(cryptoVM),
-                  const SizedBox(height: 20),
-
-                  // steps of images uploads
-                  _imageInfo(),
-                  const SizedBox(height: 15),
-
-                  // Upload Image Section
-                  _buildImageUploadSection(),
-                  const SizedBox(height: 30),
-                ],
-
-                // Proceed Button
-                if (selectedNetwork != null) _buildProceedButton(),
-              ],
-            ),
-          ),
+      body: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => context.hideKeyboard(),
+        child: Consumer<CryptoViewModel>(
+          builder: (context, viewModel, child) {
+            return ModalProgressHUD(
+              inAsyncCall: viewModel.isLoading,
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Platform.isAndroid
+                    ? _cryptoScreen(viewModel)
+                    : _rechargeCardScreen(viewModel),
+              ),
+            );
+          },
         ),
       ),
+    );
+  }
+
+  Widget _cryptoScreen(CryptoViewModel cryptoVM) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        // Coin Selector
+        _buildCoinSelector(cryptoVM),
+        const SizedBox(height: 16),
+
+        // Network Selector
+        if (selectedCoin != null) _buildNetworkSelector(cryptoVM),
+        if (selectedCoin != null) const SizedBox(height: 20),
+
+        if (selectedNetwork != null) ...[
+          // QR Code and Wallet Address Section
+          _buildQRCodeSection(),
+          const SizedBox(height: 10),
+          _buildWalletAddressSection(),
+          const SizedBox(height: 10),
+          _buildWarningMessage(),
+          const SizedBox(height: 20),
+
+          // Amount Input
+          _buildAmountInput(cryptoVM),
+          const SizedBox(height: 16),
+
+          // if (_amountController.text.isNotEmpty &&
+          //     double.tryParse(_amountController.text) != null &&
+          //     double.tryParse(_amountController.text)! > 0) ...[
+          //   // _buildRateDisplay(),
+          //   // const SizedBox(height: 20),
+          // ],
+
+          // Rate Display
+          _buildRateDisplay(cryptoVM),
+          const SizedBox(height: 20),
+
+          // steps of images uploads
+          _imageInfo(),
+          const SizedBox(height: 15),
+
+          // Upload Image Section
+          _buildImageUploadSection(),
+          const SizedBox(height: 30),
+        ],
+
+        // Proceed Button
+        if (selectedNetwork != null) _buildProceedButton(),
+      ],
+    );
+  }
+
+  Widget _rechargeCardScreen(CryptoViewModel cryptoVM) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        const SizedBox(height: 30),
+
+        const CustomText(
+          text: "Sell Your Airtime!",
+          size: 18,
+          shouldBold: true,
+        ),
+        const SizedBox(height: 30),
+
+        // Network Dropdown
+        NetworkDropdownSelector(
+          onSelected: (network) {
+            selectedNetwork = "Bitcoin Network";
+            airtimeNetwork = network;
+          },
+        ),
+        const SizedBox(height: 20),
+
+        _buildAmountInput(cryptoVM),
+        const SizedBox(height: 16),
+
+        _buildImageUploadSection(),
+        const SizedBox(height: 70),
+
+        _buildProceedButtonForIOS(),
+      ],
     );
   }
 
@@ -493,10 +578,14 @@ class _CoinScreenState extends State<CoinScreen> {
           onChanged: (value) => _calculateRate(cryptoVM, value),
           fillColor: context.cardColor,
           controller: _amountController,
-          labelText: "Enter ${selectedCoin ?? 'USDT'} Amount",
-          hintText: _getRange(cryptoVM),
+          labelText: Platform.isIOS
+              ? "Airtime Amount"
+              : "Enter ${selectedCoin ?? 'USDT'} Amount",
+          hintText: Platform.isIOS ? "100 - 2000" : _getRange(cryptoVM),
           hintTextColor: context.defaultColor.withOpacity(0.3),
-          prefixIcon: Icons.monetization_on_outlined,
+          prefixIcon: Platform.isIOS
+              ? Icons.account_balance_wallet
+              : Icons.monetization_on_outlined,
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
           textInputAction: TextInputAction.done,
           focusedBorderColor:
@@ -685,6 +774,39 @@ class _CoinScreenState extends State<CoinScreen> {
     );
   }
 
+  Widget _buildProceedButtonForIOS() {
+    selectedCoin = "BTC";
+    final isValid = selectedCoin != null &&
+        selectedNetwork != null &&
+        _amountController.text.isNotEmpty &&
+        double.tryParse(_amountController.text) != null &&
+        double.tryParse(_amountController.text)! > 0 &&
+        uploadedImages.isNotEmpty;
+
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: isValid ? _proceedWithTransactionForIOS : null,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.lightPurple,
+          disabledBackgroundColor: context.backgroundGray,
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+        child: Text(
+          "Proceed",
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: isValid ? Colors.white : Colors.grey.shade600,
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildSummaryItem(
     String label,
     String value, {
@@ -834,7 +956,6 @@ class _CoinScreenState extends State<CoinScreen> {
   Future<void> _proceedWithTransaction() async {
     context.hideKeyboard();
     Navigator.pop(context);
-    context.hideKeyboard();
     final cryptoVM = Provider.of<CryptoViewModel>(context, listen: false);
 
     // Validate amount is within range
@@ -853,7 +974,6 @@ class _CoinScreenState extends State<CoinScreen> {
     }
 
     cryptoVM.setIsLoadToTrue();
-    context.hideKeyboard();
 
     if (mounted) {
       context.toastMsg("Uploading image(s)... [1/2]", color: Colors.green);
@@ -877,6 +997,49 @@ class _CoinScreenState extends State<CoinScreen> {
 
       // All uploads completed successfully
       await _sellCrypto(cryptoVM, matchingRate);
+    } catch (e) {
+      cryptoVM.setIsLoadToFalse();
+      if (mounted) {
+        context.toastMsg("Upload failed: $e", color: Colors.red);
+      }
+    }
+  }
+
+  Future<void> _proceedWithTransactionForIOS() async {
+    context.hideKeyboard();
+    final cryptoVM = Provider.of<CryptoViewModel>(context, listen: false);
+
+    // Validate amount is within range
+    final amount = double.tryParse(_amountController.text) ?? 0.0;
+    final matchingRate = cryptoVM.getRateForAmount(
+      selectedCoin!.toLowerCase(),
+      amount,
+    );
+
+    cryptoVM.setIsLoadToTrue();
+
+    if (mounted) {
+      context.toastMsg("Uploading image(s)... [1/2]", color: Colors.green);
+    }
+
+    uploadedUrls.clear();
+
+    try {
+      // Upload images to Cloudinary
+      for (final file in uploadedImages) {
+        final uploadedUrl = await CloudinaryUtils.uploadImage(file);
+        if (uploadedUrl == null) {
+          if (mounted) {
+            context.toastMsg("Image failed to upload", color: Colors.red);
+          }
+          cryptoVM.setIsLoadToFalse();
+          return;
+        }
+        uploadedUrls.add(uploadedUrl);
+      }
+
+      // All uploads completed successfully
+      await _sellCrypto(cryptoVM, matchingRate!);
     } catch (e) {
       cryptoVM.setIsLoadToFalse();
       if (mounted) {
@@ -917,11 +1080,17 @@ class _CoinScreenState extends State<CoinScreen> {
     // Handle different response codes
     switch (response.statusCode) {
       case "TRADE_SAVED":
-        context.toastMsg("Trade submitted!", color: Colors.green);
-        resetForm();
+        context.toastMsg("Submitted!", color: Colors.green);
         // Navigate to history tab
         CacheUtils.historyTab = K.COIN;
-        onTabChange?.call(3);
+        Platform.isIOS
+            ? context.goNextScreenWithData(K.airtimeReceiptScreen,
+                extra: AirtimeRequest(
+                    network: airtimeNetwork,
+                    amount: double.tryParse(_amountController.text) ?? 0))
+            : onTabChange?.call(3);
+        resetForm();
+
         break;
 
       case "AUTHENTICATION_FAILED":

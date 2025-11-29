@@ -471,11 +471,15 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               child: Column(
                 children: [
-                  const Icon(Icons.currency_bitcoin,
-                      color: AppColors.lightPurple, size: 40),
+                  Icon(
+                      Platform.isIOS
+                          ? Icons.dataset_outlined
+                          : Icons.currency_bitcoin,
+                      color: AppColors.lightPurple,
+                      size: 40),
                   const SizedBox(height: 10),
                   Text(
-                    Platform.isIOS ? "Crypto\nTo Naira" : "Trade your\nCoins",
+                    Platform.isIOS ? "Sell\nAirtime" : "Trade your\nCoins",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: context.purpleText,

@@ -167,11 +167,21 @@ class _GiftCardScreenState extends State<GiftCardScreen> {
   Future<void> _pickImage(ImageSource source) async {
     try {
       if (source == ImageSource.camera) {
-        // Camera still needs permission
-        final status = await Permission.camera.request();
+        // Check current camera permission status
+        var status = await Permission.camera.status;
+
+        // If not granted, request permission
+        if (!status.isGranted) {
+          status = await Permission.camera.request();
+        }
+
+        // After requesting, check if it's still not granted
         if (!status.isGranted) {
           if (mounted) {
-            context.toastMsg("Camera permission denied");
+            final shouldOpenSettings = await _shouldOpenSettings();
+            if (shouldOpenSettings == true) {
+              await openAppSettings();
+            }
           }
           return;
         }
@@ -222,6 +232,32 @@ class _GiftCardScreenState extends State<GiftCardScreen> {
           ),
         );
       },
+    );
+  }
+
+  Future<bool?> _shouldOpenSettings() async {
+    return await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const CustomText(
+          text: 'Camera Permission Required',
+          size: 18,
+        ),
+        content: const CustomText(
+          text:
+              'Camera access is required to take photos. Please enable it in Settings.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Open Settings'),
+          ),
+        ],
+      ),
     );
   }
 

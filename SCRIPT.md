@@ -21,7 +21,7 @@ flutter build appbundle --release
 ./gitpush.sh
 ```
 
-#Run on my iOS
+#Run on my iPhone
 ```bash
 flutter run -d 00008020-0009751A2E82002E
 ```

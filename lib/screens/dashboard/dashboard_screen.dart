@@ -126,14 +126,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 currentIndex = index;
               });
             },
-            items: const [
-              BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-              BottomNavigationBarItem(
+            items: [
+              const BottomNavigationBarItem(
+                  icon: Icon(Icons.home), label: "Home"),
+              const BottomNavigationBarItem(
                   icon: Icon(Icons.card_giftcard), label: "Cards"),
               BottomNavigationBarItem(
-                  icon: Icon(Icons.currency_bitcoin), label: "Coins"),
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.history), label: "History"),
+                  icon: Icon(Platform.isAndroid
+                      ? Icons.currency_bitcoin
+                      : Icons.dataset_outlined),
+                  label: Platform.isAndroid ? "Coins" : "Airtime"),
+              if (Platform.isAndroid)
+                const BottomNavigationBarItem(
+                    icon: Icon(Icons.history), label: "History"),
             ],
           ),
           body: SafeArea(

@@ -1,4 +1,6 @@
 import 'package:go_router/go_router.dart';
+import 'package:legit_cards/data/models/airtime_request.dart';
+import 'package:legit_cards/screens/dashboard/coins/airtime_receipt_screen.dart';
 
 import '../data/models/auth_model.dart';
 import '../data/models/notification_model.dart';
@@ -201,6 +203,14 @@ class AppRouter {
         builder: (context, state) {
           final userData = state.extra as UserProfileM;
           return SupportChatListScreen(userProfile: userData);
+        },
+      ),
+      GoRoute(
+        name: K.airtimeReceiptScreen,
+        path: K.airtimeReceiptScreen,
+        builder: (context, state) {
+          final airtimeRequest = state.extra as AirtimeRequest;
+          return AirtimeReceiptScreen(airtimeRequest: airtimeRequest);
         },
       ),
     ],

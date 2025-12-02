@@ -14,7 +14,11 @@ class NetworkDropdownSelector extends StatefulWidget {
 }
 
 class _NetworkDropdownSelectorState extends State<NetworkDropdownSelector> {
-  final List<String> networks = ["MTN", "Glo", "Airtel"];
+  final List<String> networks = [
+    "MTN Nigeria",
+    "Glo Nigeria",
+    "Airtel Nigeria"
+  ];
   String? selected;
 
   @override

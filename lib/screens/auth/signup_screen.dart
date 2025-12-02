@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:legit_cards/Utilities/adjust_utils.dart';
@@ -215,23 +217,24 @@ class _SignupScreenState extends State<SignupScreen> {
                     const SizedBox(height: 10),
 
                     // Gender Radio Group
-                    Center(
-                      child: RadioGroup<String>(
-                        initialValue: _gender,
-                        onChanged: (value) {
-                          setState(() {
-                            _gender = value;
-                          });
-                        },
-                        options: const [
-                          RadioOption(value: 'Male', label: 'Male'),
-                          RadioOption(value: 'Female', label: 'Female'),
-                        ],
-                        activeColor: AppColors.lightPurple,
-                        textColor: context.blackWhite,
-                        spacing: 30.0,
+                    if (Platform.isAndroid)
+                      Center(
+                        child: RadioGroup<String>(
+                          initialValue: _gender,
+                          onChanged: (value) {
+                            setState(() {
+                              _gender = value;
+                            });
+                          },
+                          options: const [
+                            RadioOption(value: 'Male', label: 'Male'),
+                            RadioOption(value: 'Female', label: 'Female'),
+                          ],
+                          activeColor: AppColors.lightPurple,
+                          textColor: context.blackWhite,
+                          spacing: 30.0,
+                        ),
                       ),
-                    ),
 
                     // Terms and Conditions
                     TermsCheckbox(

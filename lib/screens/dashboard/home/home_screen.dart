@@ -479,7 +479,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       size: 40),
                   const SizedBox(height: 10),
                   Text(
-                    Platform.isIOS ? "Sell\nAirtime" : "Trade your\nCoins",
+                    Platform.isIOS
+                        ? "Sell Airtime\nVouchers"
+                        : "Trade your\nCoins",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: context.purpleText,

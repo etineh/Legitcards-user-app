@@ -325,8 +325,8 @@ class _CoinScreenState extends State<CoinScreen> {
         const SizedBox(height: 30),
 
         const CustomText(
-          text: "Sell Your Airtime!",
-          size: 18,
+          text: "Sell Mobile Network Airtime Vouchers",
+          size: 16,
           shouldBold: true,
         ),
         const SizedBox(height: 30),
@@ -673,7 +673,11 @@ class _CoinScreenState extends State<CoinScreen> {
               )
             // upload image
             : GestureDetector(
-                onTap: _showPickerOptions,
+                onTap: () {
+                  Platform.isAndroid
+                      ? _showPickerOptions()
+                      : _pickImage(ImageSource.gallery);
+                },
                 child: Container(
                   // width: 95,
                   padding: const EdgeInsets.all(12),
